@@ -41,7 +41,7 @@
 	{#if show}
 		<div class="max-w-4xl px-6 text-center" transition:blurFly>
 			<h1 class="mb-4 text-4xl font-bold tracking-tight md:text-7xl">
-				Hi, I'm <span class="text-orange-500">Zel</span>
+				Hi, I'm <span class="text-orange-500">Z1</span>
 			</h1>
 			<p class="mb-6 text-lg text-gray-300 md:text-xl">
 				An AI-powered tool to help you reach your full potential in Dota 2.
