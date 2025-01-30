@@ -41,7 +41,7 @@
 	{#if show}
 		<div class="max-w-4xl px-6 text-center" transition:blurFly>
 			<h1 class="mb-4 text-4xl font-bold tracking-tight md:text-7xl">
-				Hi, I'm <span class="text-sky-400">Zel</span>
+				Hi, I'm <span class="text-orange-500">Zel</span>
 			</h1>
 			<p class="mb-6 text-lg text-gray-300 md:text-xl">
 				An AI-powered tool to help you reach your full potential in Dota 2.
@@ -49,7 +49,7 @@
 			<div class="flex justify-center gap-6">
 				<a
 					href="#experience"
-					class="rounded-full bg-sky-500 px-6 py-3 text-white shadow-lg transition-all duration-300 hover:bg-sky-600"
+					class="rounded-full bg-orange-500 px-6 py-3 text-white shadow-lg transition-all duration-300 hover:bg-orange-600"
 				>
 					Start Now
 				</a>
