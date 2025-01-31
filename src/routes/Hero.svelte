@@ -1,9 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { cubicOut } from 'svelte/easing';
-	import Strategy from './Strategy.svelte';
+  import Strategy from './Strategy.svelte';
 
   let show: boolean = false;
+  let hideIntro: boolean = false;
 
   function blurFly(
     node: HTMLElement,
@@ -35,6 +36,9 @@
     show = true;
   });
 
+  function handleHideIntro() {
+    hideIntro = true;
+  }
 </script>
 
 <section
@@ -42,13 +46,15 @@
 >
   {#if show}
     <div class="max-w-4xl px-6 text-center" transition:blurFly>
-      <h1 class="mb-4 text-4xl font-bold tracking-tight md:text-7xl">
-        Hi, I'm <span class="text-orange-500">Z1</span>
-      </h1>
-      <p class="mb-6 text-lg text-gray-300 md:text-xl">
-        Reach your full potential in Dota 2.
-      </p>
-      <Strategy />
+      {#if !hideIntro}
+        <h1 class="mb-4 text-4xl font-bold tracking-tight md:text-7xl">
+          Hi, I'm <span class="text-orange-500">Z1</span>
+        </h1>
+        <p class="mb-6 text-lg text-gray-300 md:text-xl">
+          Reach your greatest potential in Dota 2.
+        </p>
+      {/if}
+      <Strategy onHideIntro={handleHideIntro} />
     </div>
   {/if}
 </section>

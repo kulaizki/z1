@@ -1,4 +1,5 @@
 <script lang="ts">
+  export let onHideIntro: () => void;
 
   let dotaId: string = '';
   let matches: any[] = [];
@@ -12,6 +13,7 @@
       }
       matches = await response.json();
       error = '';
+      onHideIntro();
     } catch (err) {
       error = (err as Error).message;
       matches = [];
