@@ -1,11 +1,19 @@
 <script lang="ts">
-  export let onHideIntro: () => void;
+  import { createEventDispatcher } from 'svelte';
+  import AdviceCard from '$lib/components/AdviceCard.svelte';
+
+  // Change the detail type from never to void
+  const dispatch = createEventDispatcher<{ hideIntro: void }>();
 
   let dotaId: string = '';
   let matches: any[] = [];
   let error: string = '';
+  let analysis: string = '';
 
   async function fetchMatches() {
+    // Dispatch the "hideIntro" event without a second argument
+    dispatch('hideIntro');
+
     try {
       const response = await fetch(`/api/matches/${dotaId}`);
       if (!response.ok) {
@@ -13,10 +21,29 @@
       }
       matches = await response.json();
       error = '';
-      onHideIntro();
+      await fetchAnalysis();
     } catch (err) {
       error = (err as Error).message;
       matches = [];
+    }
+  }
+
+  async function fetchAnalysis() {
+    try {
+      const response = await fetch(`/api/analyze`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ matches })
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch analysis');
+      }
+      const data = await response.json();
+      analysis = data.advice || 'No analysis available at this time.';
+    } catch (err) {
+      analysis = (err as Error).message;
     }
   }
 
@@ -27,7 +54,7 @@
   }
 </script>
 
-<div class="flex justify-center gap-6">
+<div class="flex flex-col items-center gap-6">
   <input
     type="text"
     placeholder="Enter your Dota 2 ID"
@@ -35,19 +62,12 @@
     on:keypress={handleKeyPress}
     class="w-72 text-center rounded-full px-4 py-2 text-black"
   />
+
+  {#if error}
+    <p class="mt-4 text-red-500">{error}</p>
+  {/if}
+
+  {#if analysis}
+    <AdviceCard advice={analysis} />
+  {/if}
 </div>
-{#if error}
-  <p class="mt-4 text-red-500">{error}</p>
-{/if}
-{#if matches.length > 0}
-  <div class="mt-6">
-    <h2 class="text-2xl font-bold">Recent Matches:</h2>
-    <ul class="mt-4">
-      {#each matches as match}
-        <li class="mb-2">
-          Match ID: {match.match_id}, Result: {match.radiant_win ? 'Radiant Victory' : 'Dire Victory'}
-        </li>
-      {/each}
-    </ul>
-  </div>
-{/if}

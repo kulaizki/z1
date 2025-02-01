@@ -41,9 +41,7 @@
   }
 </script>
 
-<section
-  class="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white"
->
+<section class="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
   {#if show}
     <div class="max-w-4xl px-6 text-center" transition:blurFly>
       {#if !hideIntro}
@@ -54,7 +52,7 @@
           I'll help you reach your greatest potential in Dota 2.
         </p>
       {/if}
-      <Strategy onHideIntro={handleHideIntro} />
+      <Strategy on:hideIntro={handleHideIntro} />
     </div>
   {/if}
 </section>
