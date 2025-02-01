@@ -51,7 +51,7 @@
           Hi, I'm <span class="text-orange-500">Z1</span>
         </h1>
         <p class="mb-6 text-lg text-gray-300 md:text-xl">
-          Reach your greatest potential in Dota 2.
+          I'll help you reach your greatest potential in Dota 2.
         </p>
       {/if}
       <Strategy onHideIntro={handleHideIntro} />
