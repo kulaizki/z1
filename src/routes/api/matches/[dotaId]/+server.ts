@@ -10,8 +10,10 @@ export const GET: RequestHandler = async ({ params }) => {
       return json({ error: 'Failed to fetch matches from OpenDota API' }, { status: 500 });
     }
     const matches = await response.json();
+
     return json(matches);
   } catch (error) {
+    console.error('Error fetching matches:', error);
     return json({ error: 'An error occurred while fetching matches' }, { status: 500 });
   }
 };

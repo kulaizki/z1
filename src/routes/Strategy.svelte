@@ -2,7 +2,6 @@
   import { createEventDispatcher } from 'svelte';
   import AdviceCard from '$lib/components/AdviceCard.svelte';
 
-  // Change the detail type from never to void
   const dispatch = createEventDispatcher<{ hideIntro: void }>();
 
   let dotaId: string = '';
@@ -11,7 +10,6 @@
   let analysis: string = '';
 
   async function fetchMatches() {
-    // Dispatch the "hideIntro" event without a second argument
     dispatch('hideIntro');
 
     try {
@@ -20,6 +18,7 @@
         throw new Error('Failed to fetch matches');
       }
       matches = await response.json();
+      console.log(matches);
       error = '';
       await fetchAnalysis();
     } catch (err) {
@@ -41,7 +40,8 @@
         throw new Error('Failed to fetch analysis');
       }
       const data = await response.json();
-      analysis = data.advice || 'No analysis available at this time.';
+      console.log('API Response:', data);
+      analysis = data.analysis || 'No analysis available at this time.';
     } catch (err) {
       analysis = (err as Error).message;
     }
@@ -68,6 +68,6 @@
   {/if}
 
   {#if analysis}
-    <AdviceCard advice={analysis} />
+    <AdviceCard analysis={analysis} />
   {/if}
 </div>

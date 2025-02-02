@@ -41,7 +41,7 @@
   }
 </script>
 
-<section class="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+<section class="flex p-16 min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
   {#if show}
     <div class="max-w-4xl px-6 text-center" transition:blurFly>
       {#if !hideIntro}

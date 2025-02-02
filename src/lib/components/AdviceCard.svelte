@@ -1,8 +1,9 @@
 <script lang="ts">
-  export let advice: string;
+  import Markdown from 'svelte-exmarkdown';
+  export let analysis: string;
 </script>
 
-<div class="mt-6 rounded-lg bg-white p-6 shadow-lg text-black max-w-md">
-  <h2 class="text-2xl font-bold mb-4">Match Analysis</h2>
-  <p>{advice}</p>
+<div class="mt-6 rounded-lg bg-slate-800 p-6 shadow-xl text-white max-w-7xl">
+  <h2 class="text-2xl font-semibold mb-4 text-orange-500">Match Analysis</h2>
+  <Markdown md={analysis} />
 </div>
