@@ -1,15 +1,14 @@
 import { json } from '@sveltejs/kit';
+import fs from 'fs';
+import path from 'path';
 
 export const GET = async () => {
   try {
-    const response = await fetch('https://api.opendota.com/api/heroes');
-    if (!response.ok) {
-      throw new Error('Failed to fetch hero data');
-    }
-    const heroes = await response.json();
+    const filePath = path.resolve('src/lib/data/heroes.json');
+    const data = fs.readFileSync(filePath, 'utf-8');
+    const heroes = JSON.parse(data);
     return json(heroes);
   } catch (error) {
-    console.error('Error fetching hero data:', error);
-    return new Response('An error occurred while fetching hero data', { status: 500 });
+    return json({ error: 'Failed to read heroes data' }, { status: 500 });
   }
 };

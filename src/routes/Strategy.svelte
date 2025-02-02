@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
+  import { fetchMatches, fetchAnalysis, handleKeyPress } from '$lib/services/strategy';
   import AdviceCard from '$lib/components/AdviceCard.svelte';
 
   const dispatch = createEventDispatcher<{ hideIntro: void }>();
@@ -9,48 +10,28 @@
   let error: string = '';
   let analysis: string = '';
 
-  async function fetchMatches() {
+  async function fetchMatchesHandler() {
     dispatch('hideIntro');
-
     try {
-      const response = await fetch(`/api/matches/${dotaId}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch matches');
-      }
-      matches = await response.json();
-      console.log(matches);
+      matches = await fetchMatches(dotaId);
       error = '';
-      await fetchAnalysis();
+      await fetchAnalysisHandler();
     } catch (err) {
       error = (err as Error).message;
       matches = [];
     }
   }
 
-  async function fetchAnalysis() {
+  async function fetchAnalysisHandler() {
     try {
-      const response = await fetch(`/api/analyze`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ matches })
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch analysis');
-      }
-      const data = await response.json();
-      console.log('API Response:', data);
-      analysis = data.analysis || 'No analysis available at this time.';
+      analysis = await fetchAnalysis(matches);
     } catch (err) {
       analysis = (err as Error).message;
     }
   }
 
-  function handleKeyPress(event: KeyboardEvent) {
-    if (event.key === 'Enter' && dotaId.trim()) {
-      fetchMatches();
-    }
+  function handleKeyPressWrapper(event: KeyboardEvent) {
+    handleKeyPress(event, dotaId, fetchMatchesHandler);
   }
 </script>
 
@@ -59,7 +40,7 @@
     type="text"
     placeholder="Enter your Dota 2 ID"
     bind:value={dotaId}
-    on:keypress={handleKeyPress}
+    on:keypress={handleKeyPressWrapper}
     class="w-72 text-center rounded-full px-4 py-2 text-black"
   />
 
