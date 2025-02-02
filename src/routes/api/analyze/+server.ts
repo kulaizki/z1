@@ -26,7 +26,6 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
       ...match,
       hero_name: heroMap[match.hero_id] || 'Unknown Hero',
     }));
-    console.log("Matches with hero names:", matchesWithNames);
 
     // Initialize the Gemini API client with the imported API key
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);

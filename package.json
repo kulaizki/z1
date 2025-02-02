@@ -29,6 +29,7 @@
 	},
 	"dependencies": {
 		"@google/generative-ai": "^0.21.0",
+		"@sveltejs/adapter-vercel": "^5.5.3",
 		"node-fetch": "^3.3.2",
 		"openai": "^4.82.0",
 		"svelte-exmarkdown": "^4.0.2"
