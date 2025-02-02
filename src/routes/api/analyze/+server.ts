@@ -3,21 +3,13 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { GEMINI_API_KEY } from '$env/static/private';
 import type { RequestHandler } from './$types';
 import type { Hero } from '$types/Hero';
+import heroes from '$lib/data/heroes';
 
-export const POST: RequestHandler = async ({ request, fetch }) => {
+export const POST: RequestHandler = async ({ request }) => {
   try {
     // Parse the incoming request body
     const { matches } = await request.json();
     console.log('Received matches:', matches);
-
-    // Fetch hero data
-    const response = await fetch('/api/heroes');
-    if (!response.ok) {
-      console.error('Failed to fetch heroes from /api/heroes');
-      throw new Error('Failed to fetch heroes');
-    }
-    const heroes: Hero[] = await response.json();
-    console.log('Fetched heroes:', heroes);
 
     // Create a mapping of hero IDs to names
     const heroMap = heroes.reduce((acc: Record<number, string>, hero: Hero) => {
