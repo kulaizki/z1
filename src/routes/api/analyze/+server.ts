@@ -29,7 +29,7 @@ export const POST: RequestHandler = async ({ request }) => {
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
     // Generate content based on the matches
-    const prompt = `In Markdown format with proper spacing between paragraphs, based on this user's Dota 2 matches, provide a concise summary of their favorite playstyle or hero and areas for improvement. Matches: ${JSON.stringify(matchesWithNames)}`;
+    const prompt = `Based on this user's Dota 2 matches, provide a concise summary of their favorite playstyle or hero and areas for improvement. Matches: ${JSON.stringify(matchesWithNames)}`;
     console.log('Generated prompt:', prompt);
 
     const result = await model.generateContent(prompt);
