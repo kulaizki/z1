@@ -1,11 +1,10 @@
 import { json } from '@sveltejs/kit';
-import fs from 'fs';
-import path from 'path';
+import { read } from '$app/server';
 
 export const GET = async () => {
   try {
-    const filePath = path.resolve('src/lib/data/heroes.json');  
-    const data = fs.readFileSync(filePath, 'utf-8');
+    const response = await read('src/lib/data/heroes.json');
+    const data = await response.text();
     const heroes = JSON.parse(data);
     return json(heroes);
   } catch (error) {
