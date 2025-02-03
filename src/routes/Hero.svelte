@@ -22,7 +22,7 @@
     const existingTransform = getComputedStyle(node).transform.replace('none', '');
     return {
       delay: params.delay || 0,
-      duration: params.duration || 1000,
+      duration: params.duration || 1500,
       easing: params.easing || cubicOut,
       css: (t: number) => `
         transform: ${existingTransform} translateY(${(1 - t) * 100}px);
