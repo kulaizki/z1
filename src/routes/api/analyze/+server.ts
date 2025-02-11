@@ -11,7 +11,6 @@ export const POST: RequestHandler = async ({ request }) => {
     const { matches } = await request.json();
     console.log('Received matches:', matches);
 
-    // Create a mapping of hero IDs to names
     const heroMap = heroes.reduce((acc: Record<number, string>, hero: Hero) => {
       acc[hero.id] = hero.name;
       return acc;
@@ -29,12 +28,10 @@ export const POST: RequestHandler = async ({ request }) => {
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
     // Generate content based on the matches
-    const prompt = `Based on this user's Dota 2 matches, provide a concise summary of their favorite playstyle or hero and areas for improvement. Matches: ${JSON.stringify(matchesWithNames)}`;
-    console.log('Generated prompt:', prompt);
+    const prompt = `Based on this user's Dota 2 matches, provide a concise summary of their favorite playstyle or hero. Matches: ${JSON.stringify(matchesWithNames)}`;
 
     const result = await model.generateContent(prompt);
     const analysis = result.response.text();
-    console.log('Generated analysis:', analysis);
 
     return json({ analysis });
   } catch (error) {
