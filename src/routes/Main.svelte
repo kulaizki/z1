@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { cubicOut } from 'svelte/easing';
+  import Footer from '$lib/components/Footer.svelte';
   import Strategy from './Strategy.svelte';
 
   let show: boolean = false;
@@ -41,18 +42,21 @@
   }
 </script>
 
-<section class="flex p-16 min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
-  {#if show}
-    <div class="max-w-4xl px-6 text-center" transition:blurFly>
-      {#if !hideIntro}
-        <h1 class="mb-4 text-4xl font-bold tracking-tight md:text-7xl">
-          Hi, I'm <span class="text-orange-500">Z1</span>
-        </h1>
-        <p class="mb-6 text-lg text-gray-300 md:text-xl">
-          I'll help you reach your greatest potential in Dota 2.
-        </p>
-      {/if}
-      <Strategy on:hideIntro={handleHideIntro} />
-    </div>
-  {/if}
-</section>
+<div class="flex flex-col min-h-screen">
+  <section class="flex-grow flex flex-col items-center justify-center p-16 bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+    {#if show}
+      <div class="max-w-4xl px-6 text-center" transition:blurFly>
+        {#if !hideIntro}
+          <h1 class="mb-4 text-4xl font-bold tracking-tight md:text-7xl">
+            Hi, I'm <span class="text-orange-500">Z1</span>
+          </h1>
+          <p class="mb-6 text-lg text-gray-300 md:text-xl">
+            I'll help you reach your greatest potential in Dota 2.
+          </p>
+        {/if}
+        <Strategy on:hideIntro={handleHideIntro} />
+      </div>
+    {/if}
+  </section>
+  <Footer  />
+</div>

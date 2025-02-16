@@ -1,17 +1,17 @@
 <footer class="py-4 bg-gray-800 text-white">
   <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center">
-    <p class="text-sm">
+    <p class="text-sm mb-4 sm:mb-0">
       &copy; 2025 
       <a
         href="https://github.com/kulaizki"
         target="_blank"
         rel="noopener noreferrer"
-        class="font-bold text-sky-400 hover:underline"
+        class="font-bold text-orange-500 hover:underline"
       >
         kulaizki
       </a>. All rights reserved.
     </p>
-    <div class="mt-4 sm:mt-0 flex space-x-4">
+    <div class="flex space-x-4">
       <a
         href="https://github.com/kulaizki"
         target="_blank"
