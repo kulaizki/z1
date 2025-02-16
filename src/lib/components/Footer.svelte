@@ -1,4 +1,4 @@
-<footer class="py-4 bg-gray-800 text-white">
+<footer class="py-4 bg-gray-900 text-white">
   <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center">
     <p class="text-sm mb-4 sm:mb-0">
       &copy; 2025 
