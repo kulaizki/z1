@@ -43,9 +43,9 @@
 </script>
 
 <div class="flex flex-col min-h-screen">
-  <section class="flex-grow flex flex-col items-center justify-center p-16 bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+  <section class="flex-grow flex flex-col items-center justify-center p-8 bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
     {#if show}
-      <div class="max-w-4xl px-6 text-center" transition:blurFly>
+      <div class="max-w-7xl md:max-w-4xl text-center" transition:blurFly>
         {#if !hideIntro}
           <h1 class="mb-4 text-4xl font-bold tracking-tight md:text-7xl">
             Hi, I'm <span class="text-orange-500">Z1</span>

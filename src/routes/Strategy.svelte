@@ -40,13 +40,13 @@
   }
 </script>
 
-<div class="flex flex-col items-center gap-6">
+<div class="flex flex-col items-center gap-12">
   <input
     type="text"
     placeholder="Enter your Dota 2 ID"
     bind:value={dotaId}
     on:keypress={handleKeyPressWrapper}
-    class="w-72 text-center rounded-full px-4 py-2 text-black"
+    class="w-80 text-center rounded-full px-4 py-2 text-black"
   />
 
   {#if error}
@@ -59,3 +59,4 @@
     <SummaryCard {summary} />
   {/if}
 </div>
+
