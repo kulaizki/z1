@@ -4,13 +4,14 @@
 </script>
 
 <style>
-  /* Apply global styling to dynamically generated <p> elements */
+  /* Global styling for dynamically generated content */
   :global(p) {
-    margin-bottom: 1em; 
+    margin-bottom: 1em;
+    line-height: 1.6;
   }
 </style>
 
-<div class="mt-6 rounded-lg bg-slate-800 p-6 shadow-xl text-white max-w-7xl">
-  <h2 class="text-2xl font-semibold mb-4 text-orange-500">Player Summary</h2>
+<div class="mt-8 mx-4 sm:mx-auto rounded-lg bg-gradient-to-r from-gray-800 via-black-900 to-gray-800 border border-gray-600 p-8 shadow-md text-white max-w-4xl">
+  <h2 class="text-3xl font-extrabold mb-6 text-orange-400">Player Summary</h2>
   <Markdown md={summary} />
 </div>
