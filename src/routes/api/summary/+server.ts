@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { GEMINI_API_KEY } from '$env/static/private';
-import type { RequestHandler } from './$types';
+import type { RequestHandler } from '@sveltejs/kit';
 import type { Hero } from '$types/Hero';
 import heroes from '$lib/data/heroes';
 
@@ -35,7 +35,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
     return json({ summary });
   } catch (error) {
-    console.error('Error in analyze API:', error);
+    console.error('Error in summary API:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return json({ error: errorMessage }, { status: 500 });
   }

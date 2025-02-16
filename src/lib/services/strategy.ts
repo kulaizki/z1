@@ -12,7 +12,7 @@ export async function fetchMatches(dotaId: string) {
 
 export async function fetchSummary(matches: any[]) {
   try {
-    const response = await fetch(`/api/analyze`, {
+    const response = await fetch(`/api/summary`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
