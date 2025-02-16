@@ -1,5 +1,5 @@
 <script>
-import Hero from './Hero.svelte';
+import Main from './Main.svelte';
 </script>
 
-<Hero />
+<Main />

@@ -32,6 +32,7 @@
 		"@sveltejs/adapter-vercel": "^5.5.3",
 		"node-fetch": "^3.3.2",
 		"openai": "^4.82.0",
-		"svelte-exmarkdown": "^4.0.2"
+		"svelte-exmarkdown": "^4.0.2",
+		"svelte-spinkit": "^1.0.3"
 	}
 }
