@@ -2,6 +2,7 @@
   import { createEventDispatcher } from 'svelte';
   import { fetchMatches, fetchAnalysis, handleKeyPress } from '$lib/services/strategy';
   import AdviceCard from '$lib/components/AdviceCard.svelte';
+  import { SyncLoader } from 'svelte-loading-spinners';
 
   const dispatch = createEventDispatcher<{ hideIntro: void }>();
 
@@ -9,9 +10,11 @@
   let matches: any[] = [];
   let error: string = '';
   let analysis: string = '';
+  let isLoading: boolean = false;
 
   async function fetchMatchesHandler() {
     dispatch('hideIntro');
+    isLoading = true;
     try {
       matches = await fetchMatches(dotaId);
       error = '';
@@ -19,6 +22,8 @@
     } catch (err) {
       error = (err as Error).message;
       matches = [];
+    } finally {
+      isLoading = false;
     }
   }
 
@@ -48,7 +53,9 @@
     <p class="mt-4 text-red-500">{error}</p>
   {/if}
 
-  {#if analysis}
-    <AdviceCard analysis={analysis} />
+  {#if isLoading}
+    <SyncLoader size="60" color="#FF3E00" unit="px" duration="1s" />
+  {:else if analysis}
+    <AdviceCard {analysis} />
   {/if}
 </div>
