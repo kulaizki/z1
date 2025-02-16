@@ -10,7 +10,7 @@ export async function fetchMatches(dotaId: string) {
   }
 }
 
-export async function fetchAnalysis(matches: any[]) {
+export async function fetchSummary(matches: any[]) {
   try {
     const response = await fetch(`/api/analyze`, {
       method: 'POST',
@@ -23,7 +23,7 @@ export async function fetchAnalysis(matches: any[]) {
       throw new Error('Failed to fetch analysis');
     }
     const data = await response.json();
-    return data.analysis || 'No analysis available at this time.';
+    return data.summary|| 'No analysis available at this time.';
   } catch (err) {
     throw new Error((err as Error).message);
   }

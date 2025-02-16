@@ -31,9 +31,9 @@ export const POST: RequestHandler = async ({ request }) => {
     const prompt = `Based on this user's Dota 2 matches, provide a concise summary of their favorite playstyle or hero. Matches: ${JSON.stringify(matchesWithNames)}`;
 
     const result = await model.generateContent(prompt);
-    const analysis = result.response.text();
+    const summary = result.response.text();
 
-    return json({ analysis });
+    return json({ summary });
   } catch (error) {
     console.error('Error in analyze API:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';

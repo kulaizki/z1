@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { fetchMatches, fetchAnalysis, handleKeyPress } from '$lib/services/strategy';
-  import AdviceCard from '$lib/components/AdviceCard.svelte';
+  import { fetchMatches, fetchSummary, handleKeyPress } from '$lib/services/strategy';
+  import SummaryCard from '$lib/components/SummaryCard.svelte';
   import { SyncLoader } from 'svelte-loading-spinners';
 
   const dispatch = createEventDispatcher<{ hideIntro: void }>();
@@ -9,7 +9,7 @@
   let dotaId: string = '';
   let matches: any[] = [];
   let error: string = '';
-  let analysis: string = '';
+  let summary: string = '';
   let isLoading: boolean = false;
 
   async function fetchMatchesHandler() {
@@ -18,7 +18,7 @@
     try {
       matches = await fetchMatches(dotaId);
       error = '';
-      await fetchAnalysisHandler();
+      await fetchSummaryHandler();
     } catch (err) {
       error = (err as Error).message;
       matches = [];
@@ -27,11 +27,11 @@
     }
   }
 
-  async function fetchAnalysisHandler() {
+  async function fetchSummaryHandler() {
     try {
-      analysis = await fetchAnalysis(matches);
+      summary = await fetchSummary(matches);
     } catch (err) {
-      analysis = (err as Error).message;
+      summary = (err as Error).message;
     }
   }
 
@@ -55,7 +55,7 @@
 
   {#if isLoading}
     <SyncLoader size="60" color="#FF3E00" unit="px" duration="1s" />
-  {:else if analysis}
-    <AdviceCard {analysis} />
+  {:else if summary}
+    <SummaryCard {summary} />
   {/if}
 </div>
