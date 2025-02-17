@@ -54,7 +54,7 @@
   {/if}
 
   {#if isLoading}
-    <SyncLoader size="60" color="#FF3E00" unit="px" duration="1s" />
+    <SyncLoader size="60" color="#ff8800" unit="px" duration="1s" />
   {:else if summary}
     <SummaryCard {summary} />
   {/if}
