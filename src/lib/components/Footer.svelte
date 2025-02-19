@@ -26,20 +26,6 @@
         />
         <span>GitHub</span>
       </a>
-      <a
-        href="https://www.linkedin.com/in/kulaizki/"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="LinkedIn"
-        class="flex items-center space-x-2 hover:text-orange-500"
-      >
-        <img
-          src="https://skillicons.dev/icons?i=linkedin"
-          alt="LinkedIn"
-          class="w-6 h-6"
-        />
-        <span>LinkedIn</span>
-      </a>
     </div>
   </div>
 </footer>
