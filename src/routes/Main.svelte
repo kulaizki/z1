@@ -44,7 +44,7 @@
 </script>
 
 <div class="flex flex-col min-h-screen">
-  <Header />
+  <!-- <Header /> -->
   <section class="flex-grow flex flex-col items-center justify-center p-8 bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
     {#if show}
       <div class="max-w-7xl md:max-w-4xl text-center" transition:blurFly>

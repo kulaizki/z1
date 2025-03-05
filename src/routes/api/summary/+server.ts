@@ -9,7 +9,7 @@ export const POST: RequestHandler = async ({ request }) => {
   try {
     // Parse the incoming request body
     const { matches } = await request.json();
-    console.log('Received matches:', matches);
+    // console.log('Received matches:', matches);
 
     const heroMap = heroes.reduce((acc: Record<number, string>, hero: Hero) => {
       acc[hero.id] = hero.name;
@@ -21,7 +21,7 @@ export const POST: RequestHandler = async ({ request }) => {
       ...match,
       hero_name: heroMap[match.hero_id] || 'Unknown Hero',
     }));
-    console.log('Matches with hero names:', matchesWithNames);
+    // console.log('Matches with hero names:', matchesWithNames);
 
     // Initialize the Gemini API client
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);

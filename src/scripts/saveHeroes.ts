@@ -9,7 +9,7 @@ fetch('https://api.opendota.com/api/heroes')
 			name: hero.localized_name
 		}));
 		fs.writeFileSync('heroes.json', JSON.stringify(heroes, null, 2));
-		console.log('heroes.json has been saved.');
+		// console.log('heroes.json has been saved.');
 	})
 	.catch((error) => {
 		console.error('Error fetching hero data:', error);
