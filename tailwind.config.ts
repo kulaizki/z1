@@ -4,7 +4,11 @@ export default {
 	content: ['./src/**/*.{html,js,svelte,ts}'],
 
 	theme: {
-		extend: {}
+		extend: {
+			minWidth: {
+				'4xl': '56rem'
+			}
+		}
 	},
 
 	plugins: []
