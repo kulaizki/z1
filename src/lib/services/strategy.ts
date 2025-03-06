@@ -29,6 +29,18 @@ export async function fetchSummary(matches: any[]) {
   }
 }
 
+export async function fetchPlayerStats(dotaId: string) {
+  try {
+    const response = await fetch(`/api/stats/${dotaId}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch player stats');
+    }
+    return await response.json();
+  } catch (err) {
+    throw new Error((err as Error).message);
+  }
+}
+
 export function handleKeyPress(event: KeyboardEvent, dotaId: string, fetchMatches: () => void) {
   if (event.key === 'Enter' && dotaId.trim()) {
     fetchMatches();
