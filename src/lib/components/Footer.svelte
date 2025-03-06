@@ -6,7 +6,7 @@
         href="https://github.com/kulaizki"
         target="_blank"
         rel="noopener noreferrer"
-        class="font-bold text-orange-500 hover:underline"
+        class="font-bold text-sky-500 hover:underline"
       >
         kulaizki
       </a>. All rights reserved.
@@ -17,14 +17,13 @@
         target="_blank"
         rel="noopener noreferrer"
         aria-label="GitHub"
-        class="flex items-center space-x-2 hover:text-orange-500"
+        class="flex items-center space-x-2 hover:text-sky-500"
       >
         <img
           src="https://skillicons.dev/icons?i=github"
           alt="GitHub"
-          class="w-6 h-6"
+          class="w-10 h-10"
         />
-        <span>GitHub</span>
       </a>
     </div>
   </div>

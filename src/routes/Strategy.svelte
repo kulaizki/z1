@@ -83,12 +83,12 @@
   {/if}
 
   {#if isLoading && (!summary && !playerStats)}
-    <SyncLoader size="60" color="#ff8800" unit="px" duration="1s" />
+    <SyncLoader size="60" color="#38bdf8" unit="px" duration="1s" />
   {:else}
     <div class="flex flex-col gap-8 items-center w-full">
       {#if isStatsLoading}
         <div class="w-full flex justify-center">
-          <SyncLoader size="40" color="#ff8800" unit="px" duration="1s" />
+          <SyncLoader size="40" color="#38bdf8" unit="px" duration="1s" />
         </div>
       {:else if playerStats}
         <StatsCard stats={playerStats} />
@@ -96,7 +96,7 @@
 
       {#if isSummaryLoading}
         <div class="w-full flex justify-center">
-          <SyncLoader size="40" color="#ff8800" unit="px" duration="1s" />
+          <SyncLoader size="40" color="#38bdf8" unit="px" duration="1s" />
         </div>
       {:else if summary}
         <SummaryCard {summary} />

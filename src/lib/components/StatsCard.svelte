@@ -7,8 +7,8 @@
   };
 </script>
 
-<div class="rounded-lg bg-gradient-to-br from-gray-800 via-gray-900 to-gray-800 border border-gray-600 p-8 shadow-md text-white max-w-4xl">
-  <h2 class="text-3xl font-extrabold mb-6 text-orange-400">Player Stats</h2>
+<div class="rounded-lg bg-gradient-to-br from-gray-800 via-gray-900 to-gray-800 border border-gray-600 p-8 shadow-md text-white w-full md:max-w-4xl">
+  <h2 class="text-3xl font-extrabold mb-6 text-sky-400">Player Stats</h2>
   
   <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
     <div>
@@ -35,7 +35,7 @@
               </div>
               <div class="w-full bg-gray-700 rounded-full h-2">
                 <div 
-                  class="bg-orange-500 h-2 rounded-full" 
+                  class="bg-sky-500 h-2 rounded-full" 
                   style="width: {role.percentage}%"
                 ></div>
               </div>
