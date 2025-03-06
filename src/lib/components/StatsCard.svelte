@@ -52,28 +52,21 @@
       {#if stats.favoriteHeroes && stats.favoriteHeroes.length > 0}
         <div class="space-y-4">
           {#each stats.favoriteHeroes as hero}
-            <div class="flex items-center p-3 bg-gray-800 rounded-lg border border-gray-700">
-              <img 
-                src={`https://cdn.dota2.com/apps/dota2/images/heroes/${hero.name.toLowerCase().replace(/ /g, '_').replace(/'/g, '')}_sb.png`} 
-                alt={hero.name}
-                class="w-12 h-12 rounded mr-4"
-              />
-              <div class="flex-grow">
-                <div class="flex justify-between">
-                  <span class="font-medium">{hero.name}</span>
-                  <span class="text-sm text-gray-400">{hero.games} games</span>
+            <div class="p-3 bg-gray-800 rounded-lg border border-gray-700">
+              <div class="flex justify-between">
+                <span class="font-medium mr-2">{hero.name}</span>
+                <span class="text-sm text-gray-400">{hero.games} games</span>
+              </div>
+              <div class="flex justify-between items-center mt-1">
+                <div class="w-24 bg-gray-700 rounded-full h-1.5">
+                  <div 
+                    class={`h-1.5 rounded-full ${hero.winRate >= 50 ? 'bg-green-500' : 'bg-red-500'}`}
+                    style="width: {hero.winRate}%"
+                  ></div>
                 </div>
-                <div class="flex justify-between items-center mt-1">
-                  <div class="w-24 bg-gray-700 rounded-full h-1.5">
-                    <div 
-                      class={`h-1.5 rounded-full ${hero.winRate >= 50 ? 'bg-green-500' : 'bg-red-500'}`}
-                      style="width: {hero.winRate}%"
-                    ></div>
-                  </div>
-                  <span class="text-sm {hero.winRate >= 50 ? 'text-green-400' : 'text-red-400'}">
-                    {hero.winRate.toFixed(1)}%
-                  </span>
-                </div>
+                <span class="text-sm {hero.winRate >= 50 ? 'text-green-400' : 'text-red-400'}">
+                  {hero.winRate.toFixed(1)}%
+                </span>
               </div>
             </div>
           {/each}
