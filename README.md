@@ -1,10 +1,10 @@
-# Z1: Dota 2 Performance Insights
+# Z1: Dota 2 Improvement AI 
 
-## 🎮 About the Project
+##  About the Project
 
 Z1 is an AI-powered tool designed to help Dota 2 players gain deeper insights into their gameplay and performance. By simply entering your Dota 2 ID, you can receive personalized analysis and recommendations to enhance your skills.
 
-## ✨ Current Features
+## 🔥 Current Features
 
 - **Match History Analysis**: Retrieve and analyze your recent Dota 2 matches
 - **AI-Powered Insights**: Generate a summary of your playstyle using advanced AI technology
@@ -20,14 +20,14 @@ Z1 is an AI-powered tool designed to help Dota 2 players gain deeper insights in
 - Advanced strategic insights
 - Hero-specific skill assessments
 
-## 📋 How to Use
+## How to Use
 
 1. Navigate to the website
 2. Enter your Dota 2 Player ID
 3. Press Enter or click submit
-4. Receive AI-generated insights about your recent matches
+4. Receive stats and AI-generated insights about your recent Dota 2 account
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - SvelteKit
 - TypeScript
@@ -35,7 +35,7 @@ Z1 is an AI-powered tool designed to help Dota 2 players gain deeper insights in
 - Google Gemini AI
 - OpenDota API
 
-## 🔧 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -66,7 +66,7 @@ npm install
 npm run dev
 ```
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
