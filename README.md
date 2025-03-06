@@ -9,10 +9,13 @@ Z1 is an AI-powered tool designed to help Dota 2 players gain deeper insights in
 - **Match History Analysis**: Retrieve and analyze your recent Dota 2 matches
 - **AI-Powered Insights**: Generate a summary of your playstyle using advanced AI technology
 - **Hero Identification**: Automatically map match data to hero names for comprehensive analysis
+- **Player Stats**: Access comprehensive statistics on your gameplay, including:
+  - **Favorite Heroes**: Identify your most-played heroes, detailing the number of games played and win rates.
+  - **Role Distribution**: Understand your preferred roles with a breakdown of the percentage of games played in each role.
+  - **Overall Performance**: View your total number of games and overall win rate.
 
 ## 🚀 Upcoming Features
 
-- Detailed performance metrics
 - Personalized improvement recommendations
 - Advanced strategic insights
 - Hero-specific skill assessments
