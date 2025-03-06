@@ -17,12 +17,12 @@
         target="_blank"
         rel="noopener noreferrer"
         aria-label="GitHub"
-        class="flex items-center space-x-2 hover:text-sky-500"
+        class="flex items-center space-x-2"
       >
         <img
           src="https://skillicons.dev/icons?i=github"
           alt="GitHub"
-          class="w-10 h-10"
+          class="w-10 h-10 transition ease-in-out duration-300 hover:scale-110 hover:opacity-75"
         />
       </a>
     </div>
