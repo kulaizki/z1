@@ -29,6 +29,24 @@ export async function fetchSummary(matches: any[]) {
   }
 }
 
+export async function fetchInsights(matches: any[]) {
+  try {
+    const response = await fetch(`/api/insights`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ matches })
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch insights');
+    }
+    return await response.json();
+  } catch (err) {
+    throw new Error((err as Error).message);
+  }
+}
+
 export async function fetchPlayerStats(dotaId: string) {
   try {
     const response = await fetch(`/api/stats/${dotaId}`);
