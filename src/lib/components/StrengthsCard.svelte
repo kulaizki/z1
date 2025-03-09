@@ -8,7 +8,7 @@
 	<h2
 		class="mb-6 text-3xl font-extrabold text-green-400 [text-shadow:0_0_8px_rgba(74,222,128,0.6)]"
 	>
-		Player Strengths
+		Strengths
 	</h2>
 
 	<div class="grid grid-cols-1 gap-4">
