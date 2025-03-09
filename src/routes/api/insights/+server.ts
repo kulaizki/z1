@@ -30,11 +30,11 @@ export const POST: RequestHandler = async ({ request }) => {
       Format the response as JSON like this:
       {
         "strengths": [
-          {"title": "Strong Lane Presence", "description": "You consistently maintain good farm and lane control in the early game."},
+          {"title": "Strong Lane Presence", "description": "This player consistently maintain good farm and lane control in the early game."},
           {"title": "Example Title 2", "description": "Example Description 2"}
         ],
         "improvements": [
-          {"area": "Map Awareness", "recommendation": "Check the minimap more frequently to avoid ganks and spot rotations."},
+          {"area": "Map Awareness", "recommendation": "This player should check the minimap more frequently to avoid ganks and spot rotations."},
           {"area": "Example Area 2", "recommendation": "Example Recommendation 2"}
         ]
       }
