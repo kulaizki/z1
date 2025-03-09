@@ -7,26 +7,21 @@ import heroes from '$lib/data/heroes';
 
 export const POST: RequestHandler = async ({ request }) => {
   try {
-    // Parse the incoming request to extract match data
     const { matches } = await request.json();
 
-    // Create a mapping of hero IDs to hero names
     const heroMap = heroes.reduce((acc: Record<number, string>, hero: Hero) => {
       acc[hero.id] = hero.name;
       return acc;
     }, {});
 
-    // Append hero names to each match based on hero ID
     const matchesWithNames = matches.map((match: any) => ({
       ...match,
       hero_name: heroMap[match.hero_id] || 'Unknown Hero',
     }));
 
-    // Initialize the Google Generative AI client with the provided API key
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
-    // Construct the prompt for the AI model
     const prompt = `
       Based on this user's Dota 2 matches, provide:
       1. 3-5 key strengths of the player with titles and descriptions
@@ -47,7 +42,6 @@ export const POST: RequestHandler = async ({ request }) => {
       Only provide the JSON with no additional text.  The JSON should be enclosed in a single code block. Match data: ${JSON.stringify(matchesWithNames)}
     `;
 
-    // Generate content using the AI model
     const result = await model.generateContent(prompt);
     const response = result.response;
 
@@ -63,13 +57,12 @@ export const POST: RequestHandler = async ({ request }) => {
       insightsText = insightsText.slice(3, -3).trim();
     }
 
-
     let insights;
     try {
       insights = JSON.parse(insightsText);
     } catch (parseError) {
       console.error('JSON Parsing Error:', parseError);
-      console.error('Raw Gemini Response:', insightsText); // Log the raw response
+      console.error('Raw Gemini Response:', insightsText); 
       return json({
         strengths: [],
         improvements: [],
@@ -77,10 +70,17 @@ export const POST: RequestHandler = async ({ request }) => {
       }, { status: 500 });
     }
 
+    // Filter out strengths and improvements with missing descriptions/recommendations
+    if (insights && insights.strengths) {
+      insights.strengths = insights.strengths.filter((strength: { title: string, description: string }) => strength.title && strength.description);
+    }
+    if (insights && insights.improvements) {
+      insights.improvements = insights.improvements.filter((improvement: { area: string, recommendation: string }) => improvement.area && improvement.recommendation);
+    }
+
     // Return the parsed insights as a JSON response
     return json(insights);
   } catch (error) {
-    // Log any errors encountered during the process
     console.error('Error in insights API:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return json({
