@@ -17,6 +17,7 @@ Z1 is an AI-powered tool designed to help Dota 2 players gain deeper insights in
 
 ## 🚀 Upcoming Features
 
+- Personalized skill progression roadmap
 - Personalized improvement recommendations.
 - Advanced strategic insights.
 - Hero-specific skill assessments.
