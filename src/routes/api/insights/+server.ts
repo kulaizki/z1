@@ -1,12 +1,28 @@
+// src/routes/api/insights/+server.ts
 import { json } from '@sveltejs/kit';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { GEMINI_API_KEY } from '$env/static/private';
 import type { RequestHandler } from '@sveltejs/kit';
 import type { Hero } from '$types/Hero';
 import heroes from '$lib/data/heroes';
+import { RateLimiter } from '$lib/services/rateLimiter';
 
 export const POST: RequestHandler = async ({ request }) => {
   try {
+    const rateLimiter = RateLimiter.getInstance();
+    
+    // Check if we're rate limited
+    if (rateLimiter.isRateLimited()) {
+      const waitTime = rateLimiter.getWaitTimeEstimate();
+      return json({ 
+        error: 'Rate limited', 
+        waitTime,
+        rateLimited: true,
+        strengths: [],
+        improvements: []
+      }, { status: 429 }); // 429 Too Many Requests
+    }
+
     const { matches } = await request.json();
 
     const heroMap = heroes.reduce((acc: Record<number, string>, hero: Hero) => {
@@ -18,6 +34,9 @@ export const POST: RequestHandler = async ({ request }) => {
       ...match,
       hero_name: heroMap[match.hero_id] || 'Unknown Hero',
     }));
+
+    // Acquire a token before making the API call
+    await rateLimiter.acquireToken();
 
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
@@ -39,7 +58,7 @@ export const POST: RequestHandler = async ({ request }) => {
         ]
       }
       
-      Only provide the JSON with no additional text.  The JSON should be enclosed in a single code block. Match data: ${JSON.stringify(matchesWithNames)}
+      Only provide the JSON with no additional text. The JSON should be enclosed in a single code block. Match data: ${JSON.stringify(matchesWithNames)}
     `;
 
     const result = await model.generateContent(prompt);
