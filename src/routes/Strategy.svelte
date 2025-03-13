@@ -11,6 +11,7 @@
   import StatsCard from '$lib/components/StatsCard.svelte';
   import StrengthsCard from '$lib/components/StrengthsCard.svelte';
   import ImprovementCard from '$lib/components/ImprovementCard.svelte';
+  import ApiBusyIndicator from '$lib/components/ApiBusyIndicator.svelte';
   import { SyncLoader } from 'svelte-loading-spinners';
 
   const dispatch = createEventDispatcher<{ hideIntro: void }>();
@@ -26,6 +27,12 @@
   let isStatsLoading: boolean = false;
   let isInsightsLoading: boolean = false;
 
+  // Rate limiting status
+  let summaryRateLimited: boolean = false;
+  let insightsRateLimited: boolean = false;
+  let summaryWaitTime: number = 0;
+  let insightsWaitTime: number = 0;
+
   async function fetchMatchesHandler() {
     dispatch('hideIntro');
     isLoading = true;
@@ -33,6 +40,12 @@
     isStatsLoading = true;
     isInsightsLoading = true;
     error = '';
+    
+    // Reset rate limiting status
+    summaryRateLimited = false;
+    insightsRateLimited = false;
+    summaryWaitTime = 0;
+    insightsWaitTime = 0;
 
     try {
       // Fetch matches for summary
@@ -55,12 +68,32 @@
 
   async function fetchSummaryHandler() {
     try {
-      summary = await fetchSummary(matches);
+      const response = await fetchSummary(matches);
+      
+      // Check if response contains rate limiting information
+      if (response.rateLimited) {
+        summaryRateLimited = true;
+        summaryWaitTime = response.waitTime || 0;
+        
+        // Poll until the rate limit is lifted
+        if (summaryWaitTime > 0) {
+          setTimeout(async () => {
+            isSummaryLoading = true;
+            await fetchSummaryHandler();
+          }, Math.min(summaryWaitTime * 1000, 10000)); // Wait at most 10 seconds between retries
+        }
+        return;
+      }
+      
+      summary = response.summary || '';
+      summaryRateLimited = false;
     } catch (err) {
       summary = '';
       error = (err as Error).message;
     } finally {
-      isSummaryLoading = false;
+      if (!summaryRateLimited) {
+        isSummaryLoading = false;
+      }
     }
   }
 
@@ -77,7 +110,28 @@
 
   async function fetchInsightsHandler() {
     try {
-      playerInsights = await fetchInsights(matches);
+      const response = await fetchInsights(matches);
+      
+      // Check if response contains rate limiting information
+      if (response.rateLimited) {
+        insightsRateLimited = true;
+        insightsWaitTime = response.waitTime || 0;
+        
+        // Poll until the rate limit is lifted
+        if (insightsWaitTime > 0) {
+          setTimeout(async () => {
+            isInsightsLoading = true;
+            await fetchInsightsHandler();
+          }, Math.min(insightsWaitTime * 1000, 10000)); // Wait at most 10 seconds between retries
+        }
+        return;
+      }
+      
+      playerInsights = {
+        strengths: response.strengths || [],
+        improvements: response.improvements || [],
+      };
+      insightsRateLimited = false;
     } catch (err) {
       playerInsights = {
         strengths: [],
@@ -85,7 +139,9 @@
       };
       error = (err as Error).message;
     } finally {
-      isInsightsLoading = false;
+      if (!insightsRateLimited) {
+        isInsightsLoading = false;
+      }
     }
   }
 
@@ -111,7 +167,13 @@
     <SyncLoader size="60" color="#38bdf8" unit="px" duration="1s" />
   {:else}
     <div class="flex flex-col gap-8 items-center w-full">
-      {#if isSummaryLoading}
+      <!-- Summary S-->
+      {#if summaryRateLimited}
+        <ApiBusyIndicator 
+          waitTime={summaryWaitTime} 
+          message="Analysis API is currently busy. Please wait." 
+        />
+      {:else if isSummaryLoading}
         <div class="w-full flex justify-center">
           <SyncLoader size="40" color="#38bdf8" unit="px" duration="1s" />
         </div>
@@ -119,6 +181,7 @@
         <SummaryCard {summary} />
       {/if}
 
+      <!-- Stats -->
       {#if isStatsLoading}
         <div class="w-full flex justify-center">
           <SyncLoader size="40" color="#38bdf8" unit="px" duration="1s" />
@@ -127,7 +190,13 @@
         <StatsCard stats={playerStats} />
       {/if}
 
-      {#if isInsightsLoading}
+      <!-- Insights -->
+      {#if insightsRateLimited}
+        <ApiBusyIndicator 
+          waitTime={insightsWaitTime} 
+          message="Insights API is currently busy. Please wait." 
+        />
+      {:else if isInsightsLoading}
         <div class="w-full flex justify-center">
           <SyncLoader size="40" color="#38bdf8" unit="px" duration="1s" />
         </div>
