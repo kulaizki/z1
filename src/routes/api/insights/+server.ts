@@ -39,7 +39,7 @@ export const POST: RequestHandler = async ({ request }) => {
     await rateLimiter.acquireToken();
 
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
     const prompt = `
       Based on this user's Dota 2 matches, provide:
