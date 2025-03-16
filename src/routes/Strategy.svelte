@@ -73,6 +73,7 @@
 	async function fetchSummaryHandler() {
 		try {
 			const response = await fetchSummary(matches);
+						console.log("Response", response);
 
 			// Check if response contains rate limiting information
 			if (response.rateLimited) {
@@ -92,7 +93,7 @@
 				return;
 			}
 
-			summary = response.summary || '';
+			summary = response || '';
 			summaryRateLimited = false;
 		} catch (err) {
 			summary = '';
