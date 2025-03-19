@@ -23,10 +23,12 @@
 	let playerStats: any = null;
 	let playerInsights: any = null;
 	let isLoading: boolean = false;
-	let isSummaryLoading: boolean = false;
-	let isStatsLoading: boolean = false;
-	let isInsightsLoading: boolean = false;
 	let showTestIdButton: boolean = true;
+	
+	// Tracking for successful data fetch
+	let summaryFetched: boolean = false;
+	let statsFetched: boolean = false;
+	let insightsFetched: boolean = false;
 
 	// Rate limiting status
 	let summaryRateLimited: boolean = false;
@@ -34,13 +36,18 @@
 	let summaryWaitTime: number = 0;
 	let insightsWaitTime: number = 0;
 
+	// Check if all data has been loaded
+	$: allDataLoaded = summaryFetched && statsFetched && insightsFetched;
+
 	async function fetchMatchesHandler() {
 		dispatch('hideIntro');
 		isLoading = true;
-		isSummaryLoading = true;
-		isStatsLoading = true;
-		isInsightsLoading = true;
 		error = '';
+
+		// Reset status flags
+		summaryFetched = false;
+		statsFetched = false;
+		insightsFetched = false;
 
 		// Hide the test ID button once any search is initiated
 		showTestIdButton = false;
@@ -66,7 +73,6 @@
 			error = (err as Error).message;
 			matches = [];
 		} finally {
-			isLoading = false;
 		}
 	}
 
@@ -83,7 +89,6 @@
 				if (summaryWaitTime > 0) {
 					setTimeout(
 						async () => {
-							isSummaryLoading = true;
 							await fetchSummaryHandler();
 						},
 						Math.min(summaryWaitTime * 1000, 10000)
@@ -94,24 +99,22 @@
 
 			summary = response || '';
 			summaryRateLimited = false;
+			summaryFetched = true;
 		} catch (err) {
 			summary = '';
 			error = (err as Error).message;
-		} finally {
-			if (!summaryRateLimited) {
-				isSummaryLoading = false;
-			}
+			summaryFetched = true; // Mark as fetched even on error to avoid infinite loading
 		}
 	}
 
 	async function fetchPlayerStatsHandler() {
 		try {
 			playerStats = await fetchPlayerStats(dotaId);
+			statsFetched = true;
 		} catch (err) {
 			playerStats = null;
 			error = (err as Error).message;
-		} finally {
-			isStatsLoading = false;
+			statsFetched = true; // Mark as fetched even on error
 		}
 	}
 
@@ -128,7 +131,6 @@
 				if (insightsWaitTime > 0) {
 					setTimeout(
 						async () => {
-							isInsightsLoading = true;
 							await fetchInsightsHandler();
 						},
 						Math.min(insightsWaitTime * 1000, 10000)
@@ -142,16 +144,21 @@
 				improvements: response.improvements || []
 			};
 			insightsRateLimited = false;
+			insightsFetched = true;
 		} catch (err) {
 			playerInsights = {
 				strengths: [],
 				improvements: []
 			};
 			error = (err as Error).message;
-		} finally {
-			if (!insightsRateLimited) {
-				isInsightsLoading = false;
-			}
+			insightsFetched = true; // Mark as fetched even on error
+		}
+	}
+
+	// Update loading state whenever all data states change
+	$: {
+		if (allDataLoaded && !summaryRateLimited && !insightsRateLimited) {
+			isLoading = false;
 		}
 	}
 
@@ -202,44 +209,27 @@
 		<p class="mt-4 text-red-500">{error}</p>
 	{/if}
 
-	{#if isLoading && !summary && !playerStats && !playerInsights}
+	{#if isLoading}
 		<SyncLoader size="60" color="#38bdf8" unit="px" duration="1s" />
+	{:else if summaryRateLimited || insightsRateLimited}
+		<ApiBusyIndicator
+			waitTime={Math.max(summaryWaitTime, insightsWaitTime)}
+			message="Analysis API is currently busy. Please wait."
+		/>
 	{:else}
 		<div class="flex w-full flex-col items-center gap-8">
 			<!-- Summary -->
-			{#if summaryRateLimited}
-				<ApiBusyIndicator
-					waitTime={summaryWaitTime}
-					message="Analysis API is currently busy. Please wait."
-				/>
-			{:else if isSummaryLoading}
-				<div class="flex w-full justify-center">
-					<SyncLoader size="40" color="#38bdf8" unit="px" duration="1s" />
-				</div>
-			{:else if summary}
+			{#if summary}
 				<SummaryCard {summary} />
 			{/if}
 
 			<!-- Stats -->
-			{#if isStatsLoading}
-				<div class="flex w-full justify-center">
-					<SyncLoader size="40" color="#38bdf8" unit="px" duration="1s" />
-				</div>
-			{:else if playerStats}
+			{#if playerStats}
 				<StatsCard stats={playerStats} />
 			{/if}
 
 			<!-- Insights -->
-			{#if insightsRateLimited}
-				<ApiBusyIndicator
-					waitTime={insightsWaitTime}
-					message="Insights API is currently busy. Please wait."
-				/>
-			{:else if isInsightsLoading}
-				<div class="flex w-full justify-center">
-					<SyncLoader size="40" color="#38bdf8" unit="px" duration="1s" />
-				</div>
-			{:else if playerInsights}
+			{#if playerInsights}
 				<div class="flex w-full flex-wrap justify-center gap-8">
 					{#if playerInsights.strengths && playerInsights.strengths.length > 0}
 						<div class="w-full">
