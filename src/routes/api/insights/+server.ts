@@ -1,4 +1,3 @@
-// src/routes/api/insights/+server.ts
 import { json } from '@sveltejs/kit';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { GEMINI_API_KEY } from '$env/static/private';
