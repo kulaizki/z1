@@ -10,7 +10,6 @@ export const POST: RequestHandler = async ({ request }) => {
   try {
     const rateLimiter = RateLimiter.getInstance();
     
-    // Check if we're rate limited
     if (rateLimiter.isRateLimited()) {
       const waitTime = rateLimiter.getWaitTimeEstimate();
       return json({ 

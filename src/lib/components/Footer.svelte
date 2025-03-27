@@ -42,7 +42,7 @@
       <p class="text-sm mb-4 sm:mb-0">
         &copy; 2025 
         <a
-          href="https://github.com/kulaizki"
+          href="https://kulaizki.vercel.app/"
           target="_blank"
           rel="noopener noreferrer"
           class="font-bold text-sky-500 hover:underline"
