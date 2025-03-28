@@ -29,6 +29,9 @@
 	let summaryFetched: boolean = false;
 	let statsFetched: boolean = false;
 	let insightsFetched: boolean = false;
+	
+	// Flag for invalid ID or private profile
+	let invalidIdOrPrivateProfile: boolean = false;
 
 	// Rate limiting status
 	let summaryRateLimited: boolean = false;
@@ -43,6 +46,7 @@
 		dispatch('hideIntro');
 		isLoading = true;
 		error = '';
+		invalidIdOrPrivateProfile = false;
 
 		// Reset status flags
 		summaryFetched = false;
@@ -61,6 +65,13 @@
 		try {
 			// Fetch matches for summary
 			matches = await fetchMatches(dotaId);
+			
+			// Check if matches returned is null or empty array
+			if (!matches || matches.length === 0) {
+				invalidIdOrPrivateProfile = true;
+				isLoading = false;
+				return;
+			}
 
 			// Start API calls in parallel
 			const summaryPromise = fetchSummaryHandler();
@@ -72,6 +83,8 @@
 		} catch (err) {
 			error = (err as Error).message;
 			matches = [];
+			invalidIdOrPrivateProfile = true;
+			isLoading = false;
 		} finally {
 		}
 	}
@@ -110,10 +123,19 @@
 	async function fetchPlayerStatsHandler() {
 		try {
 			playerStats = await fetchPlayerStats(dotaId);
+			
+			// Check if player stats is null
+			if (!playerStats) {
+				invalidIdOrPrivateProfile = true;
+				statsFetched = true;
+				return;
+			}
+			
 			statsFetched = true;
 		} catch (err) {
 			playerStats = null;
 			error = (err as Error).message;
+			invalidIdOrPrivateProfile = true;
 			statsFetched = true; // Mark as fetched even on error
 		}
 	}
@@ -205,12 +227,43 @@
 		</button>
 	{/if}
 
-	{#if error}
+	{#if error && !invalidIdOrPrivateProfile}
 		<p class="mt-4 text-red-500">{error}</p>
 	{/if}
 
 	{#if isLoading}
 		<SyncLoader size="60" color="#38bdf8" unit="px" duration="1s" />
+	{:else if invalidIdOrPrivateProfile}
+		<div class="mt-8 flex flex-col items-center gap-4 text-center">
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="64"
+				height="64"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="#ff5555"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
+				<circle cx="12" cy="12" r="10"></circle>
+				<line x1="12" y1="8" x2="12" y2="12"></line>
+				<line x1="12" y1="16" x2="12.01" y2="16"></line>
+			</svg>
+			<h2 class="text-xl font-bold text-red-400">Profile Not Found</h2>
+			<p class="max-w-md text-gray-300">
+				The Dota 2 ID you entered is either invalid or your match history is set to private.
+				Please check your ID and make sure your match data is public in your Dota 2 settings.
+			</p>
+			<a
+				href="https://www.opendota.com/"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="mt-2 text-sky-400 hover:text-sky-300"
+			>
+				Visit OpenDota to check your profile
+			</a>
+		</div>
 	{:else if summaryRateLimited || insightsRateLimited}
 		<ApiBusyIndicator
 			waitTime={Math.max(summaryWaitTime, insightsWaitTime)}
