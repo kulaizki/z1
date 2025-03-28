@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { cubicOut } from 'svelte/easing';
-  import Header from '$lib/components/Header.svelte';
-  import Footer from '$lib/components/Footer.svelte';
-  import Strategy from './Strategy.svelte';
+  import Header from '$lib/components/header.svelte';
+  import Footer from '$lib/components/footer.svelte';
+  import Strategy from './strategy.svelte';
 
   let show: boolean = false;
   let hideIntro: boolean = false;
