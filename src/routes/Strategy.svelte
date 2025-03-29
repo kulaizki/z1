@@ -7,11 +7,11 @@
 		fetchInsights,
 		handleKeyPress
 	} from '$lib/services/strategy';
-	import SummaryCard from '$lib/components/SummaryCard.svelte';
-	import StatsCard from '$lib/components/StatsCard.svelte';
-	import StrengthsCard from '$lib/components/StrengthsCard.svelte';
-	import ImprovementCard from '$lib/components/ImprovementCard.svelte';
-	import ApiBusyIndicator from '$lib/components/ApiBusyIndicator.svelte';
+	import SummaryCard from '$lib/components/summary-card.svelte';
+	import StatsCard from '$lib/components/stats-card.svelte';
+	import StrengthsCard from '$lib/components/strengths-card.svelte';
+	import ImprovementCard from '$lib/components/improvement-card.svelte';
+	import ApiBusyIndicator from '$lib/components/api-busy-indicator.svelte';
 	import { SyncLoader } from 'svelte-loading-spinners';
 
 	const dispatch = createEventDispatcher<{ hideIntro: void }>();
