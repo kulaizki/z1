@@ -36,23 +36,23 @@
 {#if show}
   <footer 
     class="py-4 md:py-2 bg-gray-900 border-t border-gray-600 text-white"
-    transition:slideUp
+    transition:slideUp|local
   >
-    <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center">
-      <p class="text-sm mb-4 sm:mb-0">
-        &copy; 2025 
+    <div class="gap-4 max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
+      <p class="text-sm md:my-3 order-2 md:order-1">
+        &copy; {new Date().getFullYear()} 
         <a
-          href="https://kulaizki.vercel.app/"
+          href="https://github.com/kulaizki"
           target="_blank"
           rel="noopener noreferrer"
-          class="font-bold text-sky-500 hover:underline"
+          class="font-bold text-sky-500 hover:underline hover:text-sky-300 transition ease-in-out duration-200"
         >
           kulaizki
         </a>. All rights reserved.
       </p>
-      <div class="flex space-x-4">
+      <div class="flex space-x-4 order-1 md:order-2">
         <a
-          href="https://github.com/kulaizki/z1"
+          href="https://github.com/kulaizki/nexleague"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="GitHub"
