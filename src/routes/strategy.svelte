@@ -15,14 +15,14 @@
 
 	// Define types for better clarity
 	type Match = Record<string, any>; // Replace 'any' with a specific Match type if available
-	type PlayerStats = Record<string, any> | null;
+	type PlayerStats = Record<string, any> | null; // Replace 'any' if possible
 	type PlayerInsights = {
-		strengths: string[];
-		improvements: string[];
+		strengths: Array<{ title: string; description: string }>; // Match StrengthsCard prop type
+		improvements: Array<{ area: string; recommendation: string }>; // Match ImprovementCard prop type
 	} | null;
 	type FetchResponse = { rateLimited?: boolean; waitTime?: number; [key: string]: any };
 
-	const dispatch = createEventDispatcher<{ hideIntro: void }>();
+	const dispatch = createEventDispatcher<{ hideIntro: void; analysisLoaded: void }>();
 
 	let dotaId: string | null = $state(null);
 	let matches: Match[] = $state([]);
@@ -163,21 +163,25 @@
 		try {
 			const response: FetchResponse | { strengths: string[]; improvements: string[] } = await fetchInsights(matchData);
 
+			// Check if response contains rate limiting information first
 			if (typeof response === 'object' && 'rateLimited' in response && response.rateLimited) {
 				insightsRateLimited = true;
 				insightsWaitTime = response.waitTime || 0;
 				if (insightsWaitTime > 0) {
 					setTimeout(() => fetchInsightsHandler(matchData), Math.min(insightsWaitTime * 1000, 10000));
 				}
-				return;
+				return; // Exit if rate limited
 			}
 
-			if (typeof response === 'object' && 'strengths' in response) {
+			// Now check if the response has the expected data structure
+			if (typeof response === 'object' && 'strengths' in response && 'improvements' in response) {
+				// Directly assign assuming the response structure matches PlayerInsights type
 				playerInsights = {
 					strengths: response.strengths || [],
 					improvements: response.improvements || []
 				};
 			} else {
+				console.warn("Unexpected response structure from fetchInsights:", response);
 				playerInsights = null; // Handle unexpected response structure
 			}
 			insightsRateLimited = false;
@@ -190,11 +194,14 @@
 		}
 	}
 
-	// Reactive effect to manage loading state
+	// Reactive effect to manage loading state AND dispatch event
 	$effect(() => {
 		if ((allDataLoaded && !summaryRateLimited && !insightsRateLimited) || invalidIdOrPrivateProfile) {
 			if (isLoading) {
 				isLoading = false;
+				if (!invalidIdOrPrivateProfile) { // Only dispatch if data is actually loaded
+					dispatch('analysisLoaded'); 
+				}
 			}
 		}
 	});

@@ -17,7 +17,6 @@
 		@apply mb-4 text-sm leading-relaxed text-gray-300 md:text-base;
 	}
 
-	/* Style the hero names with sky-400 */
 	:global(strong) {
 		@apply text-sky-400;
 	}
