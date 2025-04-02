@@ -1,8 +1,31 @@
-# Z1: Dota 2 Improvement AI
+# Dota 2 Player Analysis (Z1)
 
-## About the Project
+This SvelteKit application provides personalized analysis and insights for Dota 2 players.
 
-Z1 is an AI-powered tool designed to help Dota 2 players gain deeper insights into their gameplay and performance. By entering your Dota 2 ID, you can receive personalized analysis and recommendations to enhance your skills.
+## Features
+
+*   **Player ID Input:** Enter a Dota 2 ID to begin the analysis.
+*   **OpenDota Integration:** Fetches recent match data and player statistics using the OpenDota API.
+*   **AI-Powered Analysis:** Generates a text summary, identifies strengths, and suggests areas for improvement using Google Gemini AI based on match data.
+*   **Tabbed Results Display:** Presents the analysis in a clear, tabbed interface:
+    *   **Summary:** Overall summary of recent performance.
+    *   **Stats:** Detailed player statistics.
+    *   **Strengths:** Highlights positive aspects of recent gameplay.
+    *   **Tips:** Suggests areas for improvement.
+*   **Responsive Design:** Adapts layout and spacing for different screen sizes (mobile/desktop).
+*   **Loading & Error States:** Provides feedback during data fetching and handles cases like private profiles or invalid IDs.
+*   **Rate Limiting Handling:** Indicates when backend APIs are busy and retries automatically.
+
+## Technologies 
+
+*   SvelteKit
+*   Svelte 5
+*   Tailwind CSS
+*   TypeScript
+*   OpenDota API
+*   Google Gemini AI
+
+Open http://localhost:5173 (or the specified port) in your browser.
 
 ## 🔥 Current Features
 
@@ -21,58 +44,3 @@ Z1 is an AI-powered tool designed to help Dota 2 players gain deeper insights in
 - Personalized improvement recommendations.
 - Advanced strategic insights.
 - Hero-specific skill assessments.
-
-## How to Use
-
-1. Navigate to the [Z1 website](https://z1-dota.vercel.app/).
-2. Enter your Dota 2 Player ID.
-3. Press Enter or click submit.
-4. Receive stats and AI-generated insights about your Dota 2 matches.
-
-## Tech Stack
-
-- SvelteKit
-- TypeScript
-- Tailwind CSS
-- Google Gemini AI
-- OpenDota API
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js
-- npm or yarn
-- OpenDota API access
-- Google Gemini API key
-
-### Installation
-
-1. Clone the repository:
-
-    ```bash
-    git clone https://github.com/kulaizki/z1
-    cd z1
-    ```
-
-2. Install dependencies:
-
-    ```bash
-    npm install
-    ```
-
-3. Set up environment variables:
-   - Create a `.env` file.
-   - Add your Gemini API key.
-
-4. Run the development server:
-
-    ```bash
-    npm run dev
-    ```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a pull request.
-
-**Disclaimer**: Z1 is a work in progress and aims to provide helpful insights for Dota 2 players.

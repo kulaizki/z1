@@ -52,7 +52,7 @@
       </p>
       <div class="flex space-x-4 order-1 md:order-2">
         <a
-          href="https://github.com/kulaizki/nexleague"
+          href="https://github.com/kulaizki/z1"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="GitHub"
