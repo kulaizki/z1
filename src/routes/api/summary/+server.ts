@@ -44,8 +44,11 @@ export const POST: RequestHandler = async ({ request }) => {
 		const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
 		// Generate content based on the matches
-    const prompt = `Based on this user's Dota 2 matches, provide a concise summary of their favorite playstyle or hero. 
-    Format all hero names as **HeroName** (bold) so they can be styled distinctly.
+		const prompt = 
+		`Based on this user's Dota 2 matches, provide a concise summary of their favorite playstyle or hero and interesting things about the player.
+		 Make it 1 paragraph long. 
+		 Don't mention ranks in the output.
+     Format all hero names as **HeroName** (bold) so they can be styled distinctly.
     Matches: ${JSON.stringify(matchesWithNames)}`;
 
 		const result = await model.generateContent(prompt);
