@@ -1,331 +1,242 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
+	import { SyncLoader } from 'svelte-loading-spinners';
 	import {
 		fetchMatches,
 		fetchSummary,
 		fetchPlayerStats,
 		fetchInsights,
-		refreshOpenDotaProfile,
-		handleKeyPress
+		refreshOpenDotaProfile
 	} from '$lib/services/strategy';
-	import SummaryCard from '$lib/components/summary-card.svelte';
-	import StatsCard from '$lib/components/stats-card.svelte';
-	import StrengthsCard from '$lib/components/strengths-card.svelte';
-	import ImprovementCard from '$lib/components/improvement-card.svelte';
-	import ApiBusyIndicator from '$lib/components/api-busy-indicator.svelte';
-	import { SyncLoader } from 'svelte-loading-spinners';
+	import DotaIdInput from '$lib/components/dota-id-input.svelte';
+	import ProfileError from '$lib/components/profile-error.svelte';
+	import RateLimitIndicator from '$lib/components/rate-limit-indicator.svelte';
+	import ResultsDisplay from '$lib/components/results-display.svelte';
+
+	// Define types for better clarity
+	type Match = Record<string, any>; // Replace 'any' with a specific Match type if available
+	type PlayerStats = Record<string, any> | null;
+	type PlayerInsights = {
+		strengths: string[];
+		improvements: string[];
+	} | null;
+	type FetchResponse = { rateLimited?: boolean; waitTime?: number; [key: string]: any };
 
 	const dispatch = createEventDispatcher<{ hideIntro: void }>();
 
-	let dotaId: string = '';
-	let matches: any[] = [];
-	let error: string = '';
-	let summary: string = '';
-	let playerStats: any = null;
-	let playerInsights: any = null;
-	let isLoading: boolean = false;
-	let showTestIdButton: boolean = true;
-	
+	let dotaId: string | null = $state(null);
+	let matches: Match[] = $state([]);
+	let error: string | null = $state(null);
+	let summary: string | null = $state(null);
+	let playerStats: PlayerStats = $state(null);
+	let playerInsights: PlayerInsights = $state(null);
+	let isLoading: boolean = $state(false);
+
 	// Tracking for successful data fetch
-	let summaryFetched: boolean = false;
-	let statsFetched: boolean = false;
-	let insightsFetched: boolean = false;
-	
-	let invalidIdOrPrivateProfile: boolean = false;
+	let summaryFetched: boolean = $state(false);
+	let statsFetched: boolean = $state(false);
+	let insightsFetched: boolean = $state(false);
+
+	let invalidIdOrPrivateProfile: boolean = $state(false);
 
 	// Rate limiting status
-	let summaryRateLimited: boolean = false;
-	let insightsRateLimited: boolean = false;
-	let summaryWaitTime: number = 0;
-	let insightsWaitTime: number = 0;
+	let summaryRateLimited: boolean = $state(false);
+	let insightsRateLimited: boolean = $state(false);
+	let summaryWaitTime: number = $state(0);
+	let insightsWaitTime: number = $state(0);
 
 	const MIN_MATCH_COUNT = 10;
-	const REFRESH_WAIT_MS = 5000; 
+	const REFRESH_WAIT_MS = 5000;
+	const TEST_DOTA_ID = '192117652';
 
-	// Check if all data has been loaded
-	$: allDataLoaded = summaryFetched && statsFetched && insightsFetched;
+	// Derived state to check if all data has been loaded
+	const allDataLoaded = $derived(summaryFetched && statsFetched && insightsFetched);
 
-	async function fetchMatchesHandler() {
+	async function startFetchProcess(id: string) {
+		if (!id) return;
+
 		dispatch('hideIntro');
 		isLoading = true;
-		error = '';
+		error = null;
 		invalidIdOrPrivateProfile = false;
 		summaryFetched = false;
 		statsFetched = false;
 		insightsFetched = false;
-		showTestIdButton = false;
 		summaryRateLimited = false;
 		insightsRateLimited = false;
 		summaryWaitTime = 0;
 		insightsWaitTime = 0;
-		
+
 		// Clear previous results
 		matches = [];
-		summary = '';
+		summary = null;
 		playerStats = null;
 		playerInsights = null;
 
 		try {
-			matches = await fetchMatches(dotaId);
+			let currentMatches = await fetchMatches(id);
 
-			if (!matches || matches.length < MIN_MATCH_COUNT) {
-				console.log(`Initial fetch returned ${matches?.length ?? 0} matches. Attempting refresh for ${dotaId}...`);
-				
-				await refreshOpenDotaProfile(dotaId);
-
-				// Wait a bit for OpenDota to potentially process the refresh
+			if (!currentMatches || currentMatches.length < MIN_MATCH_COUNT) {
+				console.log(`Initial fetch returned ${currentMatches?.length ?? 0} matches. Attempting refresh for ${id}...`);
+				await refreshOpenDotaProfile(id);
 				await new Promise(resolve => setTimeout(resolve, REFRESH_WAIT_MS));
+				currentMatches = await fetchMatches(id);
 
-				matches = await fetchMatches(dotaId);
-
-				if (!matches || matches.length === 0) {
-						console.log(`Match fetch retry still resulted in 0 matches for ${dotaId}.`);
-						invalidIdOrPrivateProfile = true;
-						isLoading = false;
-						return;
+				if (!currentMatches || currentMatches.length === 0) {
+					console.log(`Match fetch retry still resulted in 0 matches for ${id}.`);
+					invalidIdOrPrivateProfile = true;
+					isLoading = false;
+					return;
 				} else {
-					console.log(`Match fetch retry successful. Found ${matches.length} matches.`);
+					console.log(`Match fetch retry successful. Found ${currentMatches.length} matches.`);
 				}
 			}
 
-			if (!matches || matches.length === 0) {
-				invalidIdOrPrivateProfile = true;
-				isLoading = false;
-				return;
-			}
+			matches = currentMatches; // Assign successfully fetched matches
 
-			// Start subsequent API calls in parallel now that we have matches
-			const summaryPromise = fetchSummaryHandler();
-			const statsPromise = fetchPlayerStatsHandler();
-			const insightsPromise = fetchInsightsHandler();
+			// Start subsequent API calls in parallel
+			const summaryPromise = fetchSummaryHandler(matches);
+			const statsPromise = fetchPlayerStatsHandler(id);
+			const insightsPromise = fetchInsightsHandler(matches);
 
 			// Wait for all analysis calls to complete
 			await Promise.all([summaryPromise, statsPromise, insightsPromise]);
 
 		} catch (err) {
-			console.error("Error during fetchMatchesHandler:", err); // Log the actual error
-			error = `An error occurred while fetching data. Please ensure the ID is correct and the profile is public. Details: ${(err as Error).message}`;
-			matches = []; // Clear matches on error
+			console.error("Error during fetch process:", err);
+			error = `An error occurred. Please ensure the ID is correct and the profile is public. Details: ${(err as Error).message}`;
+			matches = [];
 			invalidIdOrPrivateProfile = true; // Assume invalid ID on fetch error
 		} finally {
-			// isLoading will be set to false via the reactive statement `$: { if (allDataLoaded ...)`
-			// unless an error occurred earlier, in which case it's set explicitly.
-			if (invalidIdOrPrivateProfile) {
+			// Loading state is managed reactively below
+			if (invalidIdOrPrivateProfile && isLoading) {
 				isLoading = false;
 			}
 		}
 	}
 
-	async function fetchSummaryHandler() {
+	async function fetchSummaryHandler(matchData: Match[]) {
 		try {
-			const response = await fetchSummary(matches);
+			const response: FetchResponse | string = await fetchSummary(matchData);
 
-			// Check if response contains rate limiting information
-			if (response.rateLimited) {
+			if (typeof response === 'object' && response.rateLimited) {
 				summaryRateLimited = true;
 				summaryWaitTime = response.waitTime || 0;
-
-				// Poll until the rate limit is lifted
 				if (summaryWaitTime > 0) {
-					setTimeout(
-						async () => {
-							await fetchSummaryHandler();
-						},
-						Math.min(summaryWaitTime * 1000, 10000)
-					); // Wait at most 10 seconds between retries
+					setTimeout(() => fetchSummaryHandler(matchData), Math.min(summaryWaitTime * 1000, 10000));
 				}
 				return;
 			}
 
-			summary = response || '';
+			summary = (typeof response === 'string' ? response : null);
 			summaryRateLimited = false;
+		} catch (err) {
+			console.error("Error fetching summary:", err);
+			summary = null;
+			error = error || (err as Error).message; // Preserve earlier errors if any
+		} finally {
 			summaryFetched = true;
-		} catch (err) {
-			summary = '';
-			error = (err as Error).message;
-			summaryFetched = true; // Mark as fetched even on error to avoid infinite loading
 		}
 	}
 
-	async function fetchPlayerStatsHandler() {
+	async function fetchPlayerStatsHandler(id: string) {
 		try {
-			playerStats = await fetchPlayerStats(dotaId);
-			
-			// Check if player stats is null
-			if (!playerStats) {
+			const stats = await fetchPlayerStats(id);
+			if (!stats) {
+				console.log(`Player stats fetch returned null for ${id}.`);
 				invalidIdOrPrivateProfile = true;
-				statsFetched = true;
-				return;
+				playerStats = null;
+			} else {
+				playerStats = stats;
 			}
-			
-			statsFetched = true;
 		} catch (err) {
+			console.error("Error fetching player stats:", err);
 			playerStats = null;
-			error = (err as Error).message;
+			error = error || (err as Error).message;
 			invalidIdOrPrivateProfile = true;
-			statsFetched = true; // Mark as fetched even on error
+		} finally {
+			statsFetched = true;
 		}
 	}
 
-	async function fetchInsightsHandler() {
+	async function fetchInsightsHandler(matchData: Match[]) {
 		try {
-			const response = await fetchInsights(matches);
+			const response: FetchResponse | { strengths: string[]; improvements: string[] } = await fetchInsights(matchData);
 
-			// Check if response contains rate limiting information
-			if (response.rateLimited) {
+			if (typeof response === 'object' && 'rateLimited' in response && response.rateLimited) {
 				insightsRateLimited = true;
 				insightsWaitTime = response.waitTime || 0;
-
-				// Poll until the rate limit is lifted
 				if (insightsWaitTime > 0) {
-					setTimeout(
-						async () => {
-							await fetchInsightsHandler();
-						},
-						Math.min(insightsWaitTime * 1000, 10000)
-					); // Wait at most 10 seconds between retries
+					setTimeout(() => fetchInsightsHandler(matchData), Math.min(insightsWaitTime * 1000, 10000));
 				}
 				return;
 			}
 
-			playerInsights = {
-				strengths: response.strengths || [],
-				improvements: response.improvements || []
-			};
+			if (typeof response === 'object' && 'strengths' in response) {
+				playerInsights = {
+					strengths: response.strengths || [],
+					improvements: response.improvements || []
+				};
+			} else {
+				playerInsights = null; // Handle unexpected response structure
+			}
 			insightsRateLimited = false;
-			insightsFetched = true;
 		} catch (err) {
-			playerInsights = {
-				strengths: [],
-				improvements: []
-			};
-			error = (err as Error).message;
-			insightsFetched = true; // Mark as fetched even on error
+			console.error("Error fetching insights:", err);
+			playerInsights = null;
+			error = error || (err as Error).message;
+		} finally {
+			insightsFetched = true;
 		}
 	}
 
-	// Update loading state whenever all data states change
-	$: {
-		// Ensure loading stops only when all fetches are done *and* no rate limiting is active
-		// Or if the profile was marked as invalid
+	// Reactive effect to manage loading state
+	$effect(() => {
 		if ((allDataLoaded && !summaryRateLimited && !insightsRateLimited) || invalidIdOrPrivateProfile) {
-			isLoading = false;
+			if (isLoading) {
+				isLoading = false;
+			}
 		}
+	});
+
+	// Event handlers for DotaIdInput
+	function handleSubmitId(event: CustomEvent<string>) {
+		const submittedId = event.detail;
+		dotaId = submittedId;
+		startFetchProcess(submittedId);
 	}
 
-	function handleKeyPressWrapper(event: KeyboardEvent) {
-		handleKeyPress(event, dotaId, fetchMatchesHandler);
+	function handleUseTestId() {
+		dotaId = TEST_DOTA_ID;
+		startFetchProcess(TEST_DOTA_ID);
 	}
 
-	function useTestId() {
-		dotaId = '192117652';
-		fetchMatchesHandler();
-	}
 </script>
 
 <div class="flex flex-col items-center gap-8">
-	<input
-		type="text"
-		placeholder="Enter your Dota 2 ID"
-		bind:value={dotaId}
-		on:keypress={handleKeyPressWrapper}
-		class="w-80 rounded-full px-4 py-2 text-center text-black"
+	<DotaIdInput
+		initialValue={dotaId ?? ''} 
+		showTestButton={!dotaId} 
+		on:submitId={handleSubmitId}
+		on:useTestId={handleUseTestId}
 	/>
-
-	{#if showTestIdButton}
-		<button
-			class="flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 text-sm text-sky-400 transition-colors hover:text-sky-300"
-			on:click={useTestId}
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="16"
-				height="16"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			>
-				<path
-					d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"
-				></path>
-			</svg>
-			Try with the creator's ID: <span class="font-bold text-sky-200">192117652</span>
-		</button>
-	{/if}
 
 	{#if error && !invalidIdOrPrivateProfile}
 		<p class="mt-4 text-red-500">{error}</p>
 	{/if}
 
 	{#if isLoading}
-		<SyncLoader size="60" color="#38bdf8" unit="px" duration="1s" />
+		<div class="mt-8">
+			<SyncLoader size="60" color="#38bdf8" unit="px" duration="1s" />
+		</div>
 	{:else if invalidIdOrPrivateProfile}
-		<div class="mt-8 flex flex-col items-center gap-4 text-center">
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="64"
-				height="64"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="#ff5555"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			>
-				<circle cx="12" cy="12" r="10"></circle>
-				<line x1="12" y1="8" x2="12" y2="12"></line>
-				<line x1="12" y1="16" x2="12.01" y2="16"></line>
-			</svg>
-			<h2 class="text-xl font-bold text-red-400">Profile Not Found</h2>
-			<p class="max-w-md text-gray-300">
-				The Dota 2 ID you entered is either invalid or your match history is set to private.
-				Please check your ID and make sure your match data is public in your Dota 2 settings.
-			</p>
-			<a
-				href="https://www.opendota.com/"
-				target="_blank"
-				rel="noopener noreferrer"
-				class="mt-2 text-sky-400 hover:text-sky-300"
-			>
-				Visit OpenDota to check your profile
-			</a>
-		</div>
+		<ProfileError />
 	{:else if summaryRateLimited || insightsRateLimited}
-		<ApiBusyIndicator
+		<RateLimitIndicator
 			waitTime={Math.max(summaryWaitTime, insightsWaitTime)}
-			message="Analysis API is currently busy. Please wait."
+			message="Analysis API is currently busy. Retrying shortly."
 		/>
-	{:else}
-		<div class="flex w-full flex-col items-center gap-8">
-			<!-- Summary -->
-			{#if summary}
-				<SummaryCard {summary} />
-			{/if}
-
-			<!-- Stats -->
-			{#if playerStats}
-				<StatsCard stats={playerStats} />
-			{/if}
-
-			<!-- Insights -->
-			{#if playerInsights}
-				<div class="flex w-full flex-wrap justify-center gap-8">
-					{#if playerInsights.strengths && playerInsights.strengths.length > 0}
-						<div class="w-full">
-							<StrengthsCard strengths={playerInsights.strengths} />
-						</div>
-					{/if}
-
-					{#if playerInsights.improvements && playerInsights.improvements.length > 0}
-						<div class="w-full">
-							<ImprovementCard improvements={playerInsights.improvements} />
-						</div>
-					{/if}
-				</div>
-			{/if}
-		</div>
+	{:else if dotaId && allDataLoaded}
+		<ResultsDisplay summary={summary ?? null} playerStats={playerStats ?? null} playerInsights={playerInsights ?? null} />
 	{/if}
 </div>
