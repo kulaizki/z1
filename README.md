@@ -1,8 +1,8 @@
-# Dota 2 Player Analysis (Z1)
+# Dota 2 Player Analyzer (Z1)
 
 This SvelteKit application provides personalized analysis and insights for Dota 2 players.
 
-## Features
+## ✨ Features
 
 *   **Player ID Input:** Enter a Dota 2 ID to begin the analysis.
 *   **OpenDota Integration:** Fetches recent match data and player statistics using the OpenDota API.
@@ -16,7 +16,7 @@ This SvelteKit application provides personalized analysis and insights for Dota 
 *   **Loading & Error States:** Provides feedback during data fetching and handles cases like private profiles or invalid IDs.
 *   **Rate Limiting Handling:** Indicates when backend APIs are busy and retries automatically.
 
-## Technologies 
+## 💻 Technologies 
 
 *   SvelteKit
 *   Svelte 5
@@ -24,8 +24,6 @@ This SvelteKit application provides personalized analysis and insights for Dota 
 *   TypeScript
 *   OpenDota API
 *   Google Gemini AI
-
-Open http://localhost:5173 (or the specified port) in your browser.
 
 ## 🔥 Current Features
 
