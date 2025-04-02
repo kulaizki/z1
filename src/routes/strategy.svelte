@@ -5,6 +5,7 @@
 		fetchSummary,
 		fetchPlayerStats,
 		fetchInsights,
+		refreshOpenDotaProfile,
 		handleKeyPress
 	} from '$lib/services/strategy';
 	import SummaryCard from '$lib/components/summary-card.svelte';
@@ -30,7 +31,6 @@
 	let statsFetched: boolean = false;
 	let insightsFetched: boolean = false;
 	
-	// Flag for invalid ID or private profile
 	let invalidIdOrPrivateProfile: boolean = false;
 
 	// Rate limiting status
@@ -38,6 +38,9 @@
 	let insightsRateLimited: boolean = false;
 	let summaryWaitTime: number = 0;
 	let insightsWaitTime: number = 0;
+
+	const MIN_MATCH_COUNT = 10;
+	const REFRESH_WAIT_MS = 5000; 
 
 	// Check if all data has been loaded
 	$: allDataLoaded = summaryFetched && statsFetched && insightsFetched;
@@ -47,45 +50,69 @@
 		isLoading = true;
 		error = '';
 		invalidIdOrPrivateProfile = false;
-
-		// Reset status flags
 		summaryFetched = false;
 		statsFetched = false;
 		insightsFetched = false;
-
-		// Hide the test ID button once any search is initiated
 		showTestIdButton = false;
-
-		// Reset rate limiting status
 		summaryRateLimited = false;
 		insightsRateLimited = false;
 		summaryWaitTime = 0;
 		insightsWaitTime = 0;
+		
+		// Clear previous results
+		matches = [];
+		summary = '';
+		playerStats = null;
+		playerInsights = null;
 
 		try {
-			// Fetch matches for summary
 			matches = await fetchMatches(dotaId);
-			
-			// Check if matches returned is null or empty array
+
+			if (!matches || matches.length < MIN_MATCH_COUNT) {
+				console.log(`Initial fetch returned ${matches?.length ?? 0} matches. Attempting refresh for ${dotaId}...`);
+				
+				await refreshOpenDotaProfile(dotaId);
+
+				// Wait a bit for OpenDota to potentially process the refresh
+				await new Promise(resolve => setTimeout(resolve, REFRESH_WAIT_MS));
+
+				matches = await fetchMatches(dotaId);
+
+				if (!matches || matches.length === 0) {
+						console.log(`Match fetch retry still resulted in 0 matches for ${dotaId}.`);
+						invalidIdOrPrivateProfile = true;
+						isLoading = false;
+						return;
+				} else {
+					console.log(`Match fetch retry successful. Found ${matches.length} matches.`);
+				}
+			}
+
 			if (!matches || matches.length === 0) {
 				invalidIdOrPrivateProfile = true;
 				isLoading = false;
 				return;
 			}
 
-			// Start API calls in parallel
+			// Start subsequent API calls in parallel now that we have matches
 			const summaryPromise = fetchSummaryHandler();
 			const statsPromise = fetchPlayerStatsHandler();
 			const insightsPromise = fetchInsightsHandler();
 
-			// Wait for all to complete
+			// Wait for all analysis calls to complete
 			await Promise.all([summaryPromise, statsPromise, insightsPromise]);
+
 		} catch (err) {
-			error = (err as Error).message;
-			matches = [];
-			invalidIdOrPrivateProfile = true;
-			isLoading = false;
+			console.error("Error during fetchMatchesHandler:", err); // Log the actual error
+			error = `An error occurred while fetching data. Please ensure the ID is correct and the profile is public. Details: ${(err as Error).message}`;
+			matches = []; // Clear matches on error
+			invalidIdOrPrivateProfile = true; // Assume invalid ID on fetch error
 		} finally {
+			// isLoading will be set to false via the reactive statement `$: { if (allDataLoaded ...)`
+			// unless an error occurred earlier, in which case it's set explicitly.
+			if (invalidIdOrPrivateProfile) {
+				isLoading = false;
+			}
 		}
 	}
 
@@ -179,7 +206,9 @@
 
 	// Update loading state whenever all data states change
 	$: {
-		if (allDataLoaded && !summaryRateLimited && !insightsRateLimited) {
+		// Ensure loading stops only when all fetches are done *and* no rate limiting is active
+		// Or if the profile was marked as invalid
+		if ((allDataLoaded && !summaryRateLimited && !insightsRateLimited) || invalidIdOrPrivateProfile) {
 			isLoading = false;
 		}
 	}

@@ -59,6 +59,26 @@ export async function fetchPlayerStats(dotaId: string) {
   }
 }
 
+export async function refreshOpenDotaProfile(dotaId: string): Promise<void> {
+	try {
+		// Note: This call typically requires no specific headers or body for OpenDota's refresh endpoint.
+		const response = await fetch(`https://api.opendota.com/api/players/${dotaId}/refresh`, {
+			method: 'POST'
+		});
+
+		if (!response.ok) {
+			// Log the error but don't necessarily throw,
+			// as the subsequent match fetch will determine success.
+			console.error(`Failed to trigger OpenDota refresh for ${dotaId}. Status: ${response.status}`);
+		} else {
+			console.log(`Successfully triggered OpenDota refresh for ${dotaId}`);
+		}
+	} catch (err) {
+		// Log network or other errors during the refresh call
+		console.error(`Error triggering OpenDota refresh for ${dotaId}:`, err);
+	}
+}
+
 export function handleKeyPress(event: KeyboardEvent, dotaId: string, fetchMatches: () => void) {
   if (event.key === 'Enter' && dotaId.trim()) {
     fetchMatches();
