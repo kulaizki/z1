@@ -21,8 +21,8 @@
 				class:text-sky-400={activeTabId === tab.id}
 				class:border-transparent={activeTabId !== tab.id}
 				class:text-gray-400={activeTabId !== tab.id}
-				class:hover:border-gray-400={activeTabId !== tab.id}
-				class:hover:text-gray-200={activeTabId !== tab.id}
+				class:hover:border-sky-200={activeTabId !== tab.id}
+				class:hover:text-sky-200={activeTabId !== tab.id}
 				aria-current={activeTabId === tab.id ? 'page' : undefined}
 			>
 				{tab.label}

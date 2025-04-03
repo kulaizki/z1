@@ -371,7 +371,7 @@ export default [
   },
   {
     "id": 76,
-    "name": "Outworld Destroyer",
+    "name": "Outworld Devourer",
     "internalName": "obsidian_destroyer"
   },
   {

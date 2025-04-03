@@ -69,7 +69,7 @@
                 <span class="text-xs md:text-sm text-gray-400">{hero.games} games</span>
               </div>
               <div class="flex justify-between items-center mt-1 pl-15 md:pl-19">
-                <div class="w-full max-w-24 bg-gray-700 rounded-full h-1.5">
+                <div class="w-3/4 bg-gray-700 rounded-full h-1.5">
                   <div 
                     class={`h-1.5 rounded-full ${hero.winRate >= 50 ? 'bg-green-500' : 'bg-red-500'}`}
                     style="width: {hero.winRate}%"

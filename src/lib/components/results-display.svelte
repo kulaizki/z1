@@ -47,7 +47,7 @@
 					<SummaryCard {summary} />
 
 					<div class="mt-4 w-full max-w-2xl text-center">
-						<h3 class="mb-4 text-lg font-semibold text-gray-300">Explore Your Analysis</h3>
+						<h3 class="mb-4 text-lg font-semibold text-gray-300">Explore the Analysis</h3>
 						<div class="flex flex-wrap justify-center gap-4">
 							{#if playerStats}
 								<button 
