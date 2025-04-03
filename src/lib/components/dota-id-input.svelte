@@ -38,14 +38,14 @@
 		type="text"
 		placeholder="Enter your Dota 2 ID"
 		bind:value={dotaId}
-		on:keypress={handleKeyPress}
+		onkeypress={handleKeyPress}
 		class="w-80 rounded-full px-4 py-2 text-center text-black"
 	/>
 
 	{#if showButton}
 		<button
 			class="flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 text-sm text-sky-400 transition-colors hover:text-sky-300"
-			on:click={handleUseTestId}
+			onclick={handleUseTestId}
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -53,7 +53,7 @@
 				height="16"
 				viewBox="0 0 24 24"
 				fill="none"
-				stroke="currentColor"
+				stroke="orange"
 				stroke-width="2"
 				stroke-linecap="round"
 				stroke-linejoin="round"

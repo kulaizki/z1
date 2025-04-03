@@ -4,6 +4,9 @@
     roleDistribution: Array<{role: string, percentage: number}>;
     winRate: number;
     totalGames: number;
+    avgKda: number;
+    avgGpm: number;
+    avgXpm: number;
   };
 
   const HERO_IMG_BASE_URL = 'https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/';
@@ -25,6 +28,23 @@
           {stats.winRate.toFixed(1)}%
         </span>
       </div>
+      
+      {#if stats.avgKda != null && stats.avgGpm != null && stats.avgXpm != null}
+        <div class="space-y-3 md:space-y-4 mb-5 md:mb-6 text-sm md:text-base">
+          <div class="flex justify-between">
+            <span class="text-gray-300">Avg KDA:</span>
+            <span class="font-semibold">{stats.avgKda.toFixed(2)}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-300">Avg GPM:</span>
+            <span class="font-semibold">{stats.avgGpm.toFixed(0)}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-300">Avg XPM:</span>
+            <span class="font-semibold">{stats.avgXpm.toFixed(0)}</span>
+          </div>
+        </div>
+      {/if}
       
       <h3 class="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-200">Role Distribution</h3>
       {#if stats.roleDistribution && stats.roleDistribution.length > 0}
@@ -55,7 +75,7 @@
         <div class="space-y-3 md:space-y-4">
           {#each stats.favoriteHeroes as hero}
             {@const heroImgSrc = `${HERO_IMG_BASE_URL}${hero.internalName}.png`}
-            <div class="p-3 bg-gray-800 rounded-lg border border-gray-700">
+            <div class="p-3 bg-gray-800 rounded-lg border border-gray-700 transition-all duration-300 hover:border-sky-400">
               <div class="flex items-center justify-between mb-1">
                 <div class="flex items-center">
                   <img 

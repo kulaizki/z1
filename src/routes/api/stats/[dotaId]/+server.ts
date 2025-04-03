@@ -142,18 +142,28 @@ export const GET: RequestHandler = async ({ params }) => {
   const { dotaId } = params;
 
   try {
-    const heroStatsResponse = await fetch(`https://api.opendota.com/api/players/${dotaId}/heroes`);
+    // Fetch hero stats, win/loss, and recent matches in parallel
+    const [heroStatsResponse, wlResponse, recentMatchesResponse] = await Promise.all([
+      fetch(`https://api.opendota.com/api/players/${dotaId}/heroes`),
+      fetch(`https://api.opendota.com/api/players/${dotaId}/wl`),
+      fetch(`https://api.opendota.com/api/players/${dotaId}/recentMatches`)
+    ]);
+
+    // Check responses
     if (!heroStatsResponse.ok) {
-      return json({ error: 'Failed to fetch hero stats from OpenDota API' }, { status: 500 });
+      return json({ error: 'Failed to fetch hero stats from OpenDota API' }, { status: heroStatsResponse.status });
     }
-    const heroStats = await heroStatsResponse.json();
-    
-    // Fetch total matches
-    const wlResponse = await fetch(`https://api.opendota.com/api/players/${dotaId}/wl`);
     if (!wlResponse.ok) {
-      return json({ error: 'Failed to fetch win/loss from OpenDota API' }, { status: 500 });
+      return json({ error: 'Failed to fetch win/loss from OpenDota API' }, { status: wlResponse.status });
     }
+    if (!recentMatchesResponse.ok) {
+      // Log but don't fail the whole request if recent matches fail
+      console.warn(`Failed to fetch recent matches for ${dotaId}, status: ${recentMatchesResponse.status}`);
+    }
+
+    const heroStats = await heroStatsResponse.json();
     const wlData = await wlResponse.json();
+    const recentMatches = recentMatchesResponse.ok ? await recentMatchesResponse.json() : [];
     
     // Create a map from hero ID to the hero object from heroes.ts 
     const heroMap = heroesData.reduce((acc: Record<number, Hero>, hero: Hero) => {
@@ -186,12 +196,43 @@ export const GET: RequestHandler = async ({ params }) => {
     // Calculate overall win rate
     const totalGames = wlData.win + wlData.lose;
     const winRate = totalGames > 0 ? (wlData.win / totalGames) * 100 : 0;
+
+    // Calculate average KDA, GPM, XPM from recent matches
+    let totalKills = 0;
+    let totalDeaths = 0;
+    let totalAssists = 0;
+    let totalGpm = 0;
+    let totalXpm = 0;
+    let validMatchesCount = 0;
+
+    if (Array.isArray(recentMatches)) {
+      recentMatches.forEach((match: any) => {
+        // Basic check for valid match data
+        if (match && typeof match.kills === 'number' && typeof match.deaths === 'number' && typeof match.assists === 'number' && typeof match.gold_per_min === 'number' && typeof match.xp_per_min === 'number') {
+          totalKills += match.kills;
+          totalDeaths += match.deaths;
+          totalAssists += match.assists;
+          totalGpm += match.gold_per_min;
+          totalXpm += match.xp_per_min;
+          validMatchesCount++;
+        }
+      });
+    }
+
+    const avgKda = validMatchesCount > 0 
+      ? (totalDeaths === 0 ? (totalKills + totalAssists) : (totalKills + totalAssists) / totalDeaths) 
+      : 0;
+    const avgGpm = validMatchesCount > 0 ? totalGpm / validMatchesCount : 0;
+    const avgXpm = validMatchesCount > 0 ? totalXpm / validMatchesCount : 0;
     
     return json({
       favoriteHeroes,
       roleDistribution,
       winRate,
-      totalGames
+      totalGames,
+      avgKda, 
+      avgGpm,
+      avgXpm
     });
     
   } catch (error) {
