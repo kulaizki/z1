@@ -1,12 +1,17 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import heroes from '$lib/data/heroes';
-import type { Hero } from '$types/Hero';
+import heroesData from '$lib/data/heroes';
+
+interface Hero {
+  id: number;
+  name: string; // localized display name
+  internalName: string; // Added for image URLs
+}
 
 const ROLES = ['carry', 'mid', 'offlane', 'support', 'hard support'];
 
+// HERO_ROLES uses localized names
 const HERO_ROLES = {
-  // Strength Heroes
   "Abaddon": "hard support",
   "Alchemist": "carry",
   "Axe": "offlane",
@@ -49,8 +54,6 @@ const HERO_ROLES = {
   "Underlord": "offlane",
   "Undying": "hard support",
   "Wraith King": "carry",
-
-  // Agility Heroes
   "Anti-Mage": "carry",
   "Arc Warden": "carry",
   "Bloodseeker": "carry",
@@ -89,8 +92,6 @@ const HERO_ROLES = {
   "Venomancer": "offlane",
   "Viper": "mid",
   "Weaver": "carry",
-
-  // Intelligence Heroes
   "Ancient Apparition": "support",
   "Bane": "support",
   "Batrider": "offlane",
@@ -141,7 +142,6 @@ export const GET: RequestHandler = async ({ params }) => {
   const { dotaId } = params;
 
   try {
-    // Fetch hero statistics
     const heroStatsResponse = await fetch(`https://api.opendota.com/api/players/${dotaId}/heroes`);
     if (!heroStatsResponse.ok) {
       return json({ error: 'Failed to fetch hero stats from OpenDota API' }, { status: 500 });
@@ -155,8 +155,9 @@ export const GET: RequestHandler = async ({ params }) => {
     }
     const wlData = await wlResponse.json();
     
-    const heroMap = heroes.reduce((acc: Record<number, string>, hero: Hero) => {
-      acc[hero.id] = hero.name;
+    // Create a map from hero ID to the hero object from heroes.ts 
+    const heroMap = heroesData.reduce((acc: Record<number, Hero>, hero: Hero) => {
+      acc[hero.id] = hero;
       return acc;
     }, {});
     
@@ -165,16 +166,21 @@ export const GET: RequestHandler = async ({ params }) => {
       .sort((a: any, b: any) => b.games - a.games)
       .slice(0, 5)
       .map((stat: any) => {
-        const heroName = heroMap[stat.hero_id] || 'Unknown Hero';
+        const hero = heroMap[stat.hero_id];
+        const heroDisplayName = hero?.name || 'Unknown Hero'; 
+        // Use the internalName from the updated heroes.ts
+        const internalNameForImg = hero?.internalName || '';
+        
         return {
           id: stat.hero_id,
-          name: heroName,
+          name: heroDisplayName,
+          internalName: internalNameForImg,
           games: stat.games,
-          winRate: (stat.win / stat.games) * 100
+          winRate: stat.games > 0 ? (stat.win / stat.games) * 100 : 0 
         };
       });
     
-    // Calculate role distribution based on most played heroes
+    // Calculate role distribution (uses localized name from heroMap)
     const roleDistribution = calculateRoleDistribution(heroStats, heroMap);
     
     // Calculate overall win rate
@@ -194,7 +200,8 @@ export const GET: RequestHandler = async ({ params }) => {
   }
 };
 
-function calculateRoleDistribution(heroStats: any[], heroMap: Record<number, string>) {
+// Function signature expects Hero map (matching current heroes.ts)
+function calculateRoleDistribution(heroStats: any[], heroMap: Record<number, Hero>) {
   // Initialize role counters
   const roleCounts: Record<string, number> = {};
   ROLES.forEach(role => roleCounts[role] = 0);
@@ -203,12 +210,16 @@ function calculateRoleDistribution(heroStats: any[], heroMap: Record<number, str
   
   // Count games by role
   heroStats.forEach((stat: any) => {
-    const heroName = heroMap[stat.hero_id];
-    const role = HERO_ROLES[heroName as keyof typeof HERO_ROLES];
+    const hero = heroMap[stat.hero_id]; 
+    const heroDisplayName = hero?.name; // Use correct 'name' property
     
-    if (role) {
-      roleCounts[role] += stat.games;
-      totalGamesWithRoles += stat.games;
+    if (heroDisplayName) {
+       const role = HERO_ROLES[heroDisplayName as keyof typeof HERO_ROLES];
+      
+      if (role) {
+        roleCounts[role] += stat.games;
+        totalGamesWithRoles += stat.games;
+      }
     }
   });
   
