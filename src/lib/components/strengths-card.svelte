@@ -21,8 +21,8 @@
 				<div
 					class="rounded-lg border border-gray-700 bg-gray-800 p-3 transition-all duration-300 hover:border-green-500 md:p-4"
 				>
-					<div class="flex items-start">
-						<div>
+					<div class="flex w-full items-center justify-center text-center">
+						<div class="w-full">
 							<h3 class="mb-1 text-base font-semibold text-green-300 md:text-lg">
 								{strength.title}
 							</h3>
