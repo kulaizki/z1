@@ -13,7 +13,7 @@
 </script>
 
 <div class="rounded-lg bg-gradient-to-br from-gray-800 via-gray-900 to-gray-800 border border-gray-600 p-4 md:p-8 shadow-md text-white w-full md:min-w-4xl">
-  <h2 class="text-2xl md:text-3xl font-extrabold mb-4 md:mb-6 text-sky-400 [text-shadow:0_0_8px_rgba(56,189,248,0.6)]">Hero Stats</h2>
+  <h2 class="text-2xl md:text-3xl font-extrabold mb-4 md:mb-6 text-sky-400 [text-shadow:0_0_8px_rgba(56,189,248,0.6)]">Stats</h2>
   
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
     <div>
