@@ -55,7 +55,8 @@ export const POST: RequestHandler = async ({ request }) => {
           {"area": "Example Area 2", "recommendation": "Example Recommendation 2"}
         ]
       }
-      
+     
+      Don't mention about the data being used e.g., "based on limited data".
       Only provide the JSON with no additional text. The JSON should be enclosed in a single code block. Match data: ${JSON.stringify(matchesWithNames)}
     `;
 
