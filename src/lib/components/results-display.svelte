@@ -52,7 +52,7 @@
 							{#if playerStats}
 								<button 
 									onclick={() => activeTabId = 'stats'}
-									class="border-2 border-sky-900 rounded-full bg-sky-600 px-4 py-2 text-sm font-medium text-white transition shadow-lg transition-all duration-300 ease-in-out hover:border-sky-400 hover:bg-sky-500 hover:shadow-[0_0_32px_rgba(56,189,248,0.4)]"
+									class="border-2 border-sky-500 rounded-full bg-sky-600 px-4 py-2 text-sm font-medium text-white transition shadow-lg transition-all duration-300 ease-in-out hover:border-sky-400 hover:bg-sky-500 hover:shadow-[0_0_32px_rgba(56,189,248,0.4)]"
 								>
 									View Detailed Stats
 								</button>
@@ -60,7 +60,7 @@
 							{#if playerInsights?.strengths}
 								<button 
 									onclick={() => activeTabId = 'strengths'}
-									class="border-2 border-green-900 rounded-full bg-green-600 px-4 py-2 text-sm font-medium text-white transition hshadow-lg transition-all duration-300 ease-in-out hover:border-green-400 hover:bg-green-500 hover:shadow-[0_0_32px_rgba(0,255,26,0.4)]"
+									class="border-2 border-green-500 rounded-full bg-green-600 px-4 py-2 text-sm font-medium text-white transition hshadow-lg transition-all duration-300 ease-in-out hover:border-green-400 hover:bg-green-500 hover:shadow-[0_0_32px_rgba(0,255,26,0.4)]"
 								>
 									Discover Strengths
 								</button>
@@ -68,7 +68,7 @@
 							{#if playerInsights?.improvements}
 								<button 
 									onclick={() => activeTabId = 'improvements'}
-									class="border-2 border-orange-900 rounded-full bg-orange-600 px-4 py-2 text-sm font-medium text-white transition hshadow-lg transition-all duration-300 ease-in-out hover:border-orange-400 hover:bg-orange-500 hover:shadow-[0_0_32px_rgba(255,196,0,0.4)]"
+									class="border-2 border-orange-500 rounded-full bg-orange-600 px-4 py-2 text-sm font-medium text-white transition hshadow-lg transition-all duration-300 ease-in-out hover:border-orange-400 hover:bg-orange-500 hover:shadow-[0_0_32px_rgba(255,196,0,0.4)]"
 								>
 									Get Improvement Tips
 								</button>
