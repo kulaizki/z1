@@ -51,7 +51,7 @@
 <div class="flex flex-col min-h-screen">
   <!-- <Header /> -->
   <section 
-    class="flex-grow flex flex-col items-center p-8 text-white bg-gradient-to-br from-gray-900 via-gray-800 to-sky-400"
+    class="flex-grow flex flex-col items-center p-8 text-white bg-gradient-to-br from-gray-950 via-gray-800 to-sky-400"
     class:justify-center={!analysisIsReady}
     class:pt-16={analysisIsReady}
   >
