@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { cubicOut } from 'svelte/easing';
-  
+
   let show: boolean = false;
-  
+
   function slideUp(
     node: HTMLElement,
     params: {
@@ -27,32 +27,32 @@
       `
     };
   }
-  
+
   onMount(() => {
     show = true;
   });
 </script>
 
 {#if show}
-  <footer 
+  <footer
     class="py-2 bg-gray-950 border-t border-gray-600 text-white"
     transition:slideUp|local
   >
-    <div class="gap-4 max-w-6xl mx-auto px-6 flex flex-row justify-between items-center">
-      <p class="text-xs md:text-sm my-3">
-        &copy; {new Date().getFullYear()} 
+    <div class="gap-4 max-w-6xl mx-auto px-6 flex flex-col-reverse md:flex-row justify-between items-center">
+      <p class="text-sm my-3 text-center md:text-left">
+        &copy; {new Date().getFullYear()}
         <a
-          href="https://github.com/kulaizki"
+          href="https://fitzsixto.com/"
           target="_blank"
           rel="noopener noreferrer"
-          class="font-bold text-sky-500 hover:underline hover:text-sky-300 transition ease-in-out duration-200"
+          class="[text-shadow:0_0_8px_rgba(0,242,255,0.6)] bg-gradient-to-r from-sky-300 to-sky-600 bg-clip-text text-transparent font-bold transition ease-in-out duration-200"
         >
-          kulaizki
+          Fitzsixto
         </a>. All rights reserved.
       </p>
-      <div class="flex space-x-4">
+      <div class="flex space-x-4 pt-3 md:pt-0">
         <a
-          href="https://github.com/kulaizki/z1"
+          href="https://github.com/kulaizki/z1/"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="GitHub"
@@ -65,23 +65,19 @@
           />
         </a>
         <a
-          href="https://ko-fi.com/kulaizki"
+          href="https://www.linkedin.com/in/kulaizki/"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Ko-fi"
-          class="flex items-center space-x-2 group"
+          aria-label="LinkedIn"
+          class="flex items-center space-x-2"
         >
-          <div class="bg-white rounded-md p-1 flex items-center justify-center transition ease-in-out duration-300 group-hover:scale-110 group-hover:opacity-75">
-            <img
-              src="https://cdn.simpleicons.org/kofi/FF5E5B"
-              alt="Ko-fi"
-              class="w-8 h-8"
-            />
-          </div>
+          <img
+            src="https://skillicons.dev/icons?i=linkedin"
+            alt="LinkedIn"
+            class="w-10 h-10 transition ease-in-out duration-300 hover:scale-110 hover:opacity-75"
+          />
         </a>
       </div>
     </div>
   </footer>
 {/if}
-
-
