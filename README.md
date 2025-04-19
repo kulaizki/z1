@@ -2,7 +2,7 @@
 
 A SvelteKit web app that provides personalized analysis and insights for Dota 2 players.
 
-![z1-1-min](https://github.com/user-attachments/assets/3447cff5-7dd2-45c7-8995-b6f2fe8c1de7)
+https://github.com/user-attachments/assets/1b5ef2de-b370-471a-8470-2bce5a44d436
 
 ## 🔥 Features
 
