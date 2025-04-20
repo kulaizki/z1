@@ -45,7 +45,7 @@
           href="https://fitzsixto.com/"
           target="_blank"
           rel="noopener noreferrer"
-          class="[text-shadow:0_0_8px_rgba(0,242,255,0.6)] bg-gradient-to-r from-sky-300 to-sky-600 bg-clip-text text-transparent font-bold transition ease-in-out duration-200"
+          class="hover:from-sky-400 hover:to-sky-700 [text-shadow:0_0_8px_rgba(0,242,255,0.6)] bg-gradient-to-r from-sky-300 to-sky-600 bg-clip-text text-transparent font-bold transition ease-in-out duration-200"
         >
           Fitzsixto
         </a>. All rights reserved.
@@ -61,19 +61,6 @@
           <img
             src="https://skillicons.dev/icons?i=github"
             alt="GitHub"
-            class="w-10 h-10 transition ease-in-out duration-300 hover:scale-110 hover:opacity-75"
-          />
-        </a>
-        <a
-          href="https://www.linkedin.com/in/kulaizki/"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="LinkedIn"
-          class="flex items-center space-x-2"
-        >
-          <img
-            src="https://skillicons.dev/icons?i=linkedin"
-            alt="LinkedIn"
             class="w-10 h-10 transition ease-in-out duration-300 hover:scale-110 hover:opacity-75"
           />
         </a>
