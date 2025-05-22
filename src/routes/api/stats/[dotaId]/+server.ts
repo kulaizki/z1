@@ -204,6 +204,7 @@ export const GET: RequestHandler = async ({ params }) => {
     let totalGpm = 0;
     let totalXpm = 0;
     let validMatchesCount = 0;
+    const processedRecentMatches: Array<{ kda: number; gpm: number; xpm: number; hero_id: number; player_slot: number; radiant_win: boolean; duration: number; game_mode: number; lobby_type: number; version: number | null; kills: number; deaths: number; assists: number; hero_name: string; internalHeroName: string;}> = [];
 
     if (Array.isArray(recentMatches)) {
       recentMatches.forEach((match: any) => {
@@ -215,6 +216,25 @@ export const GET: RequestHandler = async ({ params }) => {
           totalGpm += match.gold_per_min;
           totalXpm += match.xp_per_min;
           validMatchesCount++;
+
+          const hero = heroMap[match.hero_id];
+          processedRecentMatches.push({
+            kda: match.deaths === 0 ? (match.kills + match.assists) : (match.kills + match.assists) / match.deaths,
+            gpm: match.gold_per_min,
+            xpm: match.xp_per_min,
+            hero_id: match.hero_id,
+            player_slot: match.player_slot,
+            radiant_win: match.radiant_win,
+            duration: match.duration,
+            game_mode: match.game_mode,
+            lobby_type: match.lobby_type,
+            version: match.version,
+            kills: match.kills,
+            deaths: match.deaths,
+            assists: match.assists,
+            hero_name: hero?.name || 'Unknown Hero',
+            internalHeroName: hero?.internalName || ''
+          });
         }
       });
     }
@@ -232,7 +252,8 @@ export const GET: RequestHandler = async ({ params }) => {
       totalGames,
       avgKda, 
       avgGpm,
-      avgXpm
+      avgXpm,
+      processedRecentMatches: processedRecentMatches.slice(0, 20) // Return last 20 processed matches for graph
     });
     
   } catch (error) {
