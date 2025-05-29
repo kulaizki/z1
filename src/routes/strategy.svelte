@@ -3,53 +3,18 @@
 	import { SyncLoader } from 'svelte-loading-spinners';
 	import {
 		fetchMatches,
-		fetchSummary,
-		fetchPlayerStats,
-		fetchInsights,
 		refreshOpenDotaProfile
 	} from '$lib/services/strategy';
+	import {
+		handleFetchSummaryLogic,
+		handleFetchPlayerStatsLogic,
+		handleFetchInsightsLogic
+	} from '$lib/services/strategyFetchHandlers';
 	import DotaIdInput from '$lib/components/dota-id-input.svelte';
 	import ProfileError from '$lib/components/profile-error.svelte';
 	import RateLimitIndicator from '$lib/components/rate-limit-indicator.svelte';
 	import ResultsDisplay from '$lib/components/results-display.svelte';
-
-	// Define types for better clarity
-	type ProcessedMatch = {
-		kda: number;
-		gpm: number;
-		xpm: number;
-		hero_id: number;
-		player_slot: number;
-		radiant_win: boolean;
-		duration: number;
-		game_mode: number;
-		lobby_type: number;
-		version: number | null;
-		kills: number;
-		deaths: number;
-		assists: number;
-		hero_name: string;
-		internalHeroName: string;
-	};
-
-	type Match = Record<string, any>; // Replace 'any' with a specific Match type if available
-	
-	type PlayerStats = {
-		favoriteHeroes: Array<{id: number, name: string, games: number, winRate: number, internalName: string}>;
-		roleDistribution: Array<{role: string, percentage: number}>;
-		winRate: number;
-		totalGames: number;
-		avgKda: number;
-		avgGpm: number;
-		avgXpm: number;
-		processedRecentMatches: ProcessedMatch[];
-	} | null;
-
-	type PlayerInsights = {
-		strengths: Array<{ title: string; description: string }>; // Match StrengthsCard prop type
-		improvements: Array<{ area: string; recommendation: string }>; // Match ImprovementCard prop type
-	} | null;
-	type FetchResponse = { rateLimited?: boolean; waitTime?: number; [key: string]: any };
+	import type { Match, PlayerStats, PlayerInsights, FetchResponse, ProcessedMatch } from '$lib/types/strategy';
 
 	const dispatch = createEventDispatcher<{ hideIntro: void; analysisLoaded: void }>();
 
@@ -145,82 +110,68 @@
 	}
 
 	async function fetchSummaryHandler(matchData: Match[]) {
-		try {
-			const response: FetchResponse | string = await fetchSummary(matchData);
+		const result = await handleFetchSummaryLogic(matchData);
 
-			if (typeof response === 'object' && response.rateLimited) {
-				summaryRateLimited = true;
-				summaryWaitTime = response.waitTime || 0;
-				if (summaryWaitTime > 0) {
-					setTimeout(() => fetchSummaryHandler(matchData), Math.min(summaryWaitTime * 1000, 10000));
-				}
-				return;
+		if (result.rateLimited) {
+			summaryRateLimited = true;
+			summaryWaitTime = result.waitTime || 0;
+			if (summaryWaitTime > 0) {
+				setTimeout(() => fetchSummaryHandler(matchData), Math.min(summaryWaitTime * 1000, 10000));
 			}
-
-			summary = (typeof response === 'string' ? response : null);
-			summaryRateLimited = false;
-		} catch (err) {
-			console.error("Error fetching summary:", err);
-			summary = null;
-			error = error || (err as Error).message; // Preserve earlier errors if any
-		} finally {
-			summaryFetched = true;
+			return;
 		}
+
+		if (result.error) {
+			console.error("Error fetching summary:", result.error);
+			summary = null;
+			error = error || result.error;
+		} else {
+			summary = result.summary ?? null;
+		}
+		summaryRateLimited = false;
+		summaryFetched = true;
 	}
 
 	async function fetchPlayerStatsHandler(id: string) {
-		try {
-			const stats = await fetchPlayerStats(id);
-			if (!stats) {
-				console.log(`Player stats fetch returned null for ${id}.`);
-				invalidIdOrPrivateProfile = true;
-				playerStats = null;
-			} else {
-				playerStats = stats;
-			}
-		} catch (err) {
-			console.error("Error fetching player stats:", err);
-			playerStats = null;
-			error = error || (err as Error).message;
+		const result = await handleFetchPlayerStatsLogic(id);
+
+		if (result.invalidId) {
+			console.log(`Player stats fetch returned null or error for ${id}.`);
 			invalidIdOrPrivateProfile = true;
-		} finally {
-			statsFetched = true;
+			playerStats = null;
 		}
+		if (result.error) {
+			console.error("Error fetching player stats:", result.error);
+			playerStats = null;
+			error = error || result.error;
+			invalidIdOrPrivateProfile = true;
+		} else if (result.stats) {
+			playerStats = result.stats;
+		}
+		statsFetched = true;
 	}
 
 	async function fetchInsightsHandler(matchData: Match[]) {
-		try {
-			const response: FetchResponse | { strengths: string[]; improvements: string[] } = await fetchInsights(matchData);
+		const result = await handleFetchInsightsLogic(matchData);
 
-			// Check if response contains rate limiting information first
-			if (typeof response === 'object' && 'rateLimited' in response && response.rateLimited) {
-				insightsRateLimited = true;
-				insightsWaitTime = response.waitTime || 0;
-				if (insightsWaitTime > 0) {
-					setTimeout(() => fetchInsightsHandler(matchData), Math.min(insightsWaitTime * 1000, 10000));
-				}
-				return; // Exit if rate limited
+		if (result.rateLimited) {
+			insightsRateLimited = true;
+			insightsWaitTime = result.waitTime || 0;
+			if (insightsWaitTime > 0) {
+				setTimeout(() => fetchInsightsHandler(matchData), Math.min(insightsWaitTime * 1000, 10000));
 			}
-
-			// Now check if the response has the expected data structure
-			if (typeof response === 'object' && 'strengths' in response && 'improvements' in response) {
-				// Directly assign assuming the response structure matches PlayerInsights type
-				playerInsights = {
-					strengths: response.strengths || [],
-					improvements: response.improvements || []
-				};
-			} else {
-				console.warn("Unexpected response structure from fetchInsights:", response);
-				playerInsights = null; // Handle unexpected response structure
-			}
-			insightsRateLimited = false;
-		} catch (err) {
-			console.error("Error fetching insights:", err);
-			playerInsights = null;
-			error = error || (err as Error).message;
-		} finally {
-			insightsFetched = true;
+			return;
 		}
+
+		if (result.error) {
+			console.error("Error fetching insights:", result.error);
+			playerInsights = null;
+			error = error || result.error;
+		} else {
+			playerInsights = result.insights ?? null;
+		}
+		insightsRateLimited = false;
+		insightsFetched = true;
 	}
 
 	// Reactive effect to manage loading state AND dispatch event
@@ -228,7 +179,7 @@
 		if ((allDataLoaded && !summaryRateLimited && !insightsRateLimited) || invalidIdOrPrivateProfile) {
 			if (isLoading) {
 				isLoading = false;
-				if (!invalidIdOrPrivateProfile) { // Only dispatch if data is actually loaded
+				if (!invalidIdOrPrivateProfile) {
 					dispatch('analysisLoaded'); 
 				}
 			}
