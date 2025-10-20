@@ -32,6 +32,15 @@ https://github.com/user-attachments/assets/1b5ef2de-b370-471a-8470-2bce5a44d436
 - OpenDota API
 - Google Gemini AI
 
+## 🛠️ Development
+
+Use pnpm for dependency management and scripts:
+
+```sh
+pnpm install
+pnpm dev
+```
+
 ## 🚀 Upcoming Features
 
 - Personalized skill progression roadmap
