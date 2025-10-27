@@ -9,8 +9,8 @@ import { RateLimiter } from '$lib/services/rateLimiter';
 export const POST: RequestHandler = async ({ request }) => {
   try {
     const rateLimiter = RateLimiter.getInstance();
-    
-    if (rateLimiter.isRateLimited()) {
+
+    if (!rateLimiter.tryAcquireToken()) {
       const waitTime = rateLimiter.getWaitTimeEstimate();
       return json({ 
         error: 'Rate limited', 
@@ -32,9 +32,6 @@ export const POST: RequestHandler = async ({ request }) => {
       ...match,
       hero_name: heroMap[match.hero_id] || 'Unknown Hero',
     }));
-
-    // Acquire a token before making the API call
-    await rateLimiter.acquireToken();
 
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });

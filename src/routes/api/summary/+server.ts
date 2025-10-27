@@ -10,8 +10,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const rateLimiter = RateLimiter.getInstance();
 
-		// Check if we're rate limited
-		if (rateLimiter.isRateLimited()) {
+		if (!rateLimiter.tryAcquireToken()) {
 			const waitTime = rateLimiter.getWaitTimeEstimate();
 			return json(
 				{
@@ -35,9 +34,6 @@ export const POST: RequestHandler = async ({ request }) => {
 			...match,
 			hero_name: heroMap[match.hero_id] || 'Unknown Hero'
 		}));
-
-		// Acquire a token before making the API call
-		await rateLimiter.acquireToken();
 
 		// Initialize the Gemini API client
 		const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
